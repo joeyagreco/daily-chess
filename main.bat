@@ -12,6 +12,13 @@ IF "%1"=="fmt" (
 ) ELSE IF "%1"=="docker" (
     REM run docker image
     call :run_docker
+) ELSE IF "%1"=="docker-push" (
+    REM tag and push docker image
+    IF "%2"=="" (
+        echo Error: Tag not provided. Please specify a tag.
+        exit /b
+    )
+    call :run_docker_push %2
 ) ELSE (
     echo Invalid flag. Please specify a valid flag.
 )
@@ -33,4 +40,9 @@ exit /b
 
 :run_docker
 docker run daily_chess
+exit /b
+
+:run_docker_push
+docker tag daily_chess joeyagreco/daily-chess:%1
+docker push joeyagreco/daily-chess:%1
 exit /b
