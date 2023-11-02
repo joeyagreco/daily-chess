@@ -37,6 +37,19 @@ class ChessGame:
             winner_username = self.black_username
         return winner_username
 
+    def elo_for_user(self, username: str) -> int:
+        """
+        Returns the elo difference from this game for the given username.
+        """
+        if username == self.white_username:
+            print(int(self.white_rating_dif))
+            return int(self.white_rating_dif)
+        elif username == self.black_username:
+            print(int(self.black_rating_dif))
+            return int(self.black_rating_dif)
+
+        raise Exception(f"Invalid username '{username}' for game.")
+
     def from_text(text: str) -> ChessGame:
         metadata = {key: value for key, value in re.findall(r'\[(.*?) "(.*?)"\]', text)}
         moves = re.search(r"\n\n(.*?)$", text, re.DOTALL).group(1)

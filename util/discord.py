@@ -3,7 +3,7 @@ import requests
 
 def send_webhook(*, webhook_url: str, embeds: list[dict]):
     """
-    https://birdie0.github.io/discord-webhooks-guide/structure/embed/fields.html
+    https://birdie0.github.io/discord-webhooks-guide/structure/embeds.html
     """
     data = {"embeds": embeds}
     response = requests.post(webhook_url, json=data)

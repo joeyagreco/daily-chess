@@ -30,29 +30,19 @@ def main() -> None:
         finished=True,
     )
 
-    # filter out to include games that were lost and tied
-    # loss = 1
-    # tie = 0.5
-    openings_and_negative_count = defaultdict(float)
+    # figure out net elo for each opening
+    openings_and_net_elo = defaultdict(float)
     openings_and_game_urls: dict[str, list[str]] = {}
     for game in games:
         if game.opening_name not in openings_and_game_urls.keys():
             openings_and_game_urls[game.opening_name] = []
-        add_game_url = False
-        if game.winner_username is None:
-            # draw
-            openings_and_negative_count[game.opening_name] += 0.5
-            add_game_url = True
-        elif game.winner_username != USERNAME:
-            # loss
-            openings_and_negative_count[game.opening_name] += 1
-            add_game_url = True
-        if add_game_url:
+        openings_and_net_elo[game.opening_name] += game.elo_for_user(USERNAME)
+        if game.winner_username != USERNAME:
             openings_and_game_urls[game.opening_name].append(game.game_url)
-    openings_and_negative_count = dict(openings_and_negative_count)
+    openings_and_net_elo = dict(openings_and_net_elo)
 
     # Convert dict to sorted list of tuples
-    sorted_openings = sorted(openings_and_negative_count.items(), key=lambda x: x[1], reverse=True)
+    sorted_openings = sorted(openings_and_net_elo.items(), key=lambda x: x[1], reverse=False)
     send_openings = sorted_openings[:DISCORD_DAILY_OPENINGS_TO_SEND]
 
     title = "DAILY CHESS UPDATE"
@@ -60,16 +50,15 @@ def main() -> None:
         f"Your worst {DISCORD_DAILY_OPENINGS_TO_SEND} openings over the past {NUM_GAMES} games."
     )
 
-    info_body = ""
-    for opening_name, score in send_openings:
-        if score > 0:
-            info_body += f"\n__**{opening_name}**__: {score}\n\n"
-            for game_url in openings_and_game_urls[opening_name]:
-                info_body += f"{game_url}\n"
+    fields = []
+    for opening_name, elo in send_openings:
+        value = f"\n({elo} elo)\n\n"
+        for game_url in openings_and_game_urls[opening_name]:
+            value += f"{game_url}\n"
+        fields.append({"name": opening_name, "value": value, "inline": False})
 
-    description = f"{description}\n\n{info_body}"
-
-    embed = {"title": title, "description": description}
+    embed = {"title": title, "description": description, "fields": fields}
+    print(embed)
 
     # send to discord
     send_webhook(webhook_url=WEBHOOK_URL, embeds=[embed])
