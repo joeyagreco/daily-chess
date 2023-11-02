@@ -4,6 +4,7 @@ import requests
 
 from api.BaseApiClient import BaseApiClient
 from enumeration.PerfType import PerfType
+from enumeration.Sort import Sort
 from model.ChessGame import ChessGame
 
 
@@ -24,7 +25,7 @@ class LichessApiClient(BaseApiClient):
         rated: Optional[bool] = None,
         perfType: Optional[PerfType] = None,
         tags: Optional[bool] = None,
-        sort: Optional[str] = None,  # TODO: enum
+        sort: Optional[Sort] = None,  # TODO: enum
         opening: Optional[bool] = None,
         finished: Optional[bool] = None,
     ) -> list[ChessGame]:
@@ -41,7 +42,7 @@ class LichessApiClient(BaseApiClient):
         if tags is not None:
             params["tags"] = tags
         if sort is not None:
-            params["sort"] = sort
+            params["sort"] = sort.name
         if opening is not None:
             params["opening"] = opening
         if finished is not None:

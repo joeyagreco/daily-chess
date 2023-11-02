@@ -1,5 +1,6 @@
 from api.LichessApiClient import LichessApiClient
 from enumeration.PerfType import PerfType
+from enumeration.Sort import Sort
 
 if __name__ == "__main__":
     lac = LichessApiClient()
@@ -9,7 +10,7 @@ if __name__ == "__main__":
         rated=True,
         perfType=PerfType.BLITZ,
         tags=True,
-        sort="dateDesc",
+        sort=Sort.DATE_DESC,
         opening=True,
         finished=True,
     )
