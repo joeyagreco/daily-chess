@@ -4,6 +4,7 @@ from enumeration.PerfType import PerfType
 from enumeration.Sort import Sort
 from model.ChessGame import ChessGame
 from service.chess_game import get_games_for_user
+from util.discord import send_webhook
 from util.EnvironmentReader import EnvironmentReader
 
 if __name__ == "__main__":
@@ -11,6 +12,8 @@ if __name__ == "__main__":
     NUM_GAMES = int(EnvironmentReader.get("NUM_GAMES"))
     RATED = bool(EnvironmentReader.get("RATED"))
     PERF_TYPE = PerfType.from_str(EnvironmentReader.get("PERF_TYPE"))
+    WEBHOOK_URL = EnvironmentReader.get("DISCORD_WEBHOOK_URL")
+    DISCORD_DAILY_OPENINGS_TO_SEND = int(EnvironmentReader.get("DISCORD_DAILY_OPENINGS_TO_SEND"))
 
     games: list[ChessGame] = get_games_for_user(
         USERNAME,
@@ -41,5 +44,11 @@ if __name__ == "__main__":
     # Convert dict to sorted list of tuples
     sorted_openings = sorted(openings_and_negative_count.items(), key=lambda x: x[1], reverse=True)
 
-    print(sorted_openings)
-    print(openings_and_game_urls)
+    send_openings = sorted_openings[: DISCORD_DAILY_OPENINGS_TO_SEND + 1]
+    for opening_name, _ in send_openings:
+        ...
+
+    # send to discord
+    print("1")
+    send_webhook(webhook_url=WEBHOOK_URL, content=str(openings_and_game_urls))
+    print("2")
