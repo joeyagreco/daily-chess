@@ -34,7 +34,7 @@ Daily Chess Reviews.
 3. Use the package manager [pip](https://pip.pypa.io/en/stable/) to install the dependencies.
 
     ```bash
-    pip install -r requirements.txt
+    python -m pip install -r requirements.txt
     ```
 4. Run the script
     ```bash
