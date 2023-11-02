@@ -38,11 +38,11 @@ class LichessApiClient(BaseApiClient):
         if rated is not None:
             params["rated"] = rated
         if perfType is not None:
-            params["perfType"] = perfType.name
+            params["perfType"] = perfType.value
         if tags is not None:
             params["tags"] = tags
         if sort is not None:
-            params["sort"] = sort.name
+            params["sort"] = sort.value
         if opening is not None:
             params["opening"] = opening
         if finished is not None:
