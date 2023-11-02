@@ -7,7 +7,7 @@ from enumeration.PerfType import PerfType
 from enumeration.Sort import Sort
 from model.ChessGame import ChessGame
 from service.chess_game import get_games_for_user
-from util.discord import send_webhook
+from util.discord import send_discord_message
 from util.EnvironmentReader import EnvironmentReader
 
 
@@ -60,7 +60,7 @@ def main() -> None:
     embed = {"title": title, "description": description, "fields": fields}
 
     # send to discord
-    send_webhook(webhook_url=WEBHOOK_URL, embeds=[embed])
+    send_discord_message(webhook_url=WEBHOOK_URL, embeds=[embed])
 
 
 if __name__ == "__main__":
