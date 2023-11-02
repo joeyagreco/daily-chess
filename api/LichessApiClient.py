@@ -26,7 +26,7 @@ class LichessApiClient(BaseApiClient):
         sort: Optional[str] = None,  # TODO: enum
         opening: Optional[bool] = None,
         finished: Optional[bool] = None,
-    ) -> ChessGame:
+    ) -> list[ChessGame]:
         ...
         url = f"{cls.__BASE_URL}{cls.__GAMES_ROUTE}{cls.__USER_ROUTE}/{username}"
 
@@ -49,4 +49,9 @@ class LichessApiClient(BaseApiClient):
         url = cls._build_url_with_params(url, params)
 
         response = cls._rest_call(requests.get, url)
-        print(response)
+        
+        games_list = []
+        games_text = response.text.strip().split("\n\n\n")
+        for game_text in games_text:
+            games_list.append(ChessGame.from_text(game_text))
+        return games_list

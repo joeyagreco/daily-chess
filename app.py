@@ -2,7 +2,7 @@ from api.LichessApiClient import LichessApiClient
 
 if __name__ == "__main__":
     lac = LichessApiClient()
-    lac.get_games_for_user(
+    games = lac.get_games_for_user(
         "drcoffeekill",
         max=2,
         rated=True,
@@ -12,3 +12,4 @@ if __name__ == "__main__":
         opening=True,
         finished=True,
     )
+    print(games[0])

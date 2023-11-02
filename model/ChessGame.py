@@ -1,7 +1,9 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-
+import re
+from typing import Optional
+from datetime import datetime
 
 @dataclass(kw_only=True)
 class ChessGame:
@@ -18,6 +20,27 @@ class ChessGame:
     black_rating_dif: str
     variant: str
     time_control: str
-    opening_name: str
     termination: str
     moves: str
+    opening_name: Optional[str] = None
+    
+    def from_text(text: str) -> ChessGame:
+        metadata = {key: value for key, value in re.findall(r'\[(.*?) "(.*?)"\]', text)}
+        moves = re.search(r'\n\n(.*?)$', text, re.DOTALL).group(1)
+        
+        return ChessGame(event_name=metadata["Event"],
+                         game_url=metadata["Site"],
+                         date=datetime.strptime(metadata["Date"], "%Y.%m.%d").date(),
+                         white_username=metadata["White"],
+                         black_username=metadata["Black"],
+                         result=metadata["Result"],
+                         utc_date=datetime.strptime(metadata["UTCDate"], "%Y.%m.%d").date(),
+                         white_elo=metadata["WhiteElo"],
+                         black_elo=metadata["BlackElo"],
+                         white_rating_dif=metadata["WhiteRatingDiff"],
+                         black_rating_dif=metadata["BlackRatingDiff"],
+                         variant=metadata["Variant"],
+                         time_control=metadata["TimeControl"],
+                         opening_name=metadata.get("Opening"),
+                         termination=metadata["Termination"],
+                         moves=moves)
