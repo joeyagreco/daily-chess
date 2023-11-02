@@ -14,7 +14,7 @@ class LichessApiClient(BaseApiClient):
     __USER_ROUTE = "/user"
 
     def __init__(self):
-        pass
+        super().__init__()
 
     @classmethod
     def get_games_for_user(
