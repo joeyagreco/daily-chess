@@ -45,10 +45,21 @@ if __name__ == "__main__":
     sorted_openings = sorted(openings_and_negative_count.items(), key=lambda x: x[1], reverse=True)
 
     send_openings = sorted_openings[: DISCORD_DAILY_OPENINGS_TO_SEND + 1]
-    for opening_name, _ in send_openings:
-        ...
+
+    title = "DAILY CHESS UPDATE"
+    description = (
+        f"Your worst {DISCORD_DAILY_OPENINGS_TO_SEND} openings over the past {NUM_GAMES} games."
+    )
+
+    info_body = ""
+    for opening_name, score in send_openings:
+        info_body += f"__**{opening_name}**__: {score}\n"
+        for game_url in openings_and_game_urls[opening_name]:
+            info_body += f"{game_url}\n"
+
+    description = f"{description}\n\n{info_body}"
+
+    embed = {"title": title, "description": description}
 
     # send to discord
-    print("1")
-    send_webhook(webhook_url=WEBHOOK_URL, content=str(openings_and_game_urls))
-    print("2")
+    send_webhook(webhook_url=WEBHOOK_URL, embeds=[embed])
