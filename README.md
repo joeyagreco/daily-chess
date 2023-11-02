@@ -1,5 +1,5 @@
 <div align="center">
-    <img src="https://raw.githubusercontent.com/joeyagreco/daily-chess/main/img/daily_chess_logo.png" alt="daily chess logo" width="300"/>
+    <img src="https://github.com/joeyagreco/daily-chess/blob/main/img/daily_chess_logo.png" alt="daily chess logo" width="300"/>
 
 Daily Chess Reviews.
 
