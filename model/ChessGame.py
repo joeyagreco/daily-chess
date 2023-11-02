@@ -25,6 +25,18 @@ class ChessGame:
     moves: str
     opening_name: Optional[str] = None
 
+    @property
+    def winner_username(self) -> Optional[str]:
+        """
+        Returns None for draws.
+        """
+        winner_username = None
+        if self.result == "1-0":
+            winner_username = self.white_username
+        elif self.result == "0-1":
+            winner_username = self.black_username
+        return winner_username
+
     def from_text(text: str) -> ChessGame:
         metadata = {key: value for key, value in re.findall(r'\[(.*?) "(.*?)"\]', text)}
         moves = re.search(r"\n\n(.*?)$", text, re.DOTALL).group(1)

@@ -39,11 +39,13 @@ def main() -> None:
         if game.opening_name not in openings_and_game_urls.keys():
             openings_and_game_urls[game.opening_name] = []
         add_game_url = False
-        if game.result == "0-1":
-            openings_and_negative_count[game.opening_name] += 1
-            add_game_url = True
-        elif game.result == "1/2-1/2":
+        if game.winner_username is None:
+            # draw
             openings_and_negative_count[game.opening_name] += 0.5
+            add_game_url = True
+        elif game.winner_username != USERNAME:
+            # loss
+            openings_and_negative_count[game.opening_name] += 1
             add_game_url = True
         if add_game_url:
             openings_and_game_urls[game.opening_name].append(game.game_url)
