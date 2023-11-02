@@ -58,7 +58,6 @@ def main() -> None:
         fields.append({"name": opening_name, "value": value, "inline": False})
 
     embed = {"title": title, "description": description, "fields": fields}
-    print(embed)
 
     # send to discord
     send_webhook(webhook_url=WEBHOOK_URL, embeds=[embed])
