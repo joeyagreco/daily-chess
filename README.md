@@ -31,6 +31,18 @@
     python app.py
     ``````
 
+## Run with Docker
+
+1. Ensure your `.env` file is created and the variables are correctly set
+2. Build Docker
+    ```bash
+    ./main build-docker
+    ```
+3. Run Docker
+    ```bash
+    ./main docker
+    ```
+
 
 ## Contributing
 
