@@ -42,10 +42,8 @@ class ChessGame:
         Returns the elo difference from this game for the given username.
         """
         if username == self.white_username:
-            print(int(self.white_rating_dif))
             return int(self.white_rating_dif)
         elif username == self.black_username:
-            print(int(self.black_rating_dif))
             return int(self.black_rating_dif)
 
         raise Exception(f"Invalid username '{username}' for game.")
