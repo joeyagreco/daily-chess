@@ -1,4 +1,7 @@
+import time
 from collections import defaultdict
+
+import schedule
 
 from enumeration.PerfType import PerfType
 from enumeration.Sort import Sort
@@ -7,7 +10,8 @@ from service.chess_game import get_games_for_user
 from util.discord import send_webhook
 from util.EnvironmentReader import EnvironmentReader
 
-if __name__ == "__main__":
+
+def main() -> None:
     USERNAME = EnvironmentReader.get("LICHESS_USERNAME")
     NUM_GAMES = int(EnvironmentReader.get("NUM_GAMES"))
     RATED = bool(EnvironmentReader.get("RATED"))
@@ -62,3 +66,11 @@ if __name__ == "__main__":
 
     # send to discord
     send_webhook(webhook_url=WEBHOOK_URL, embeds=[embed])
+
+
+if __name__ == "__main__":
+    schedule.every().day.at(EnvironmentReader.get("RUN_AT_TIME")).do(main)
+
+    while True:
+        schedule.run_pending()
+        time.sleep(1)
