@@ -6,7 +6,7 @@
     ```bash
     git clone https://github.com/joeyagreco/daily-chess.git
     ```
-2. Create a .env file with the following variables
+2. Create a .env file in the root of the project with the following variables
     ```bash
     LICHESS_USERNAME
     NUM_GAMES
