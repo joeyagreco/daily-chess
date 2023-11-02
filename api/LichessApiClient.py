@@ -3,6 +3,7 @@ from typing import Optional
 import requests
 
 from api.BaseApiClient import BaseApiClient
+from enumeration.PerfType import PerfType
 from model.ChessGame import ChessGame
 
 
@@ -21,7 +22,7 @@ class LichessApiClient(BaseApiClient):
         *,
         max: Optional[int] = None,
         rated: Optional[bool] = None,
-        perfType: Optional[str] = None,  # TODO: enum
+        perfType: Optional[PerfType] = None,
         tags: Optional[bool] = None,
         sort: Optional[str] = None,  # TODO: enum
         opening: Optional[bool] = None,
@@ -36,7 +37,7 @@ class LichessApiClient(BaseApiClient):
         if rated is not None:
             params["rated"] = rated
         if perfType is not None:
-            params["perfType"] = perfType
+            params["perfType"] = perfType.name
         if tags is not None:
             params["tags"] = tags
         if sort is not None:
@@ -49,7 +50,7 @@ class LichessApiClient(BaseApiClient):
         url = cls._build_url_with_params(url, params)
 
         response = cls._rest_call(requests.get, url)
-        
+
         games_list = []
         games_text = response.text.strip().split("\n\n\n")
         for game_text in games_text:

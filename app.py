@@ -1,4 +1,5 @@
 from api.LichessApiClient import LichessApiClient
+from enumeration.PerfType import PerfType
 
 if __name__ == "__main__":
     lac = LichessApiClient()
@@ -6,7 +7,7 @@ if __name__ == "__main__":
         "drcoffeekill",
         max=2,
         rated=True,
-        perfType="blitz",
+        perfType=PerfType.BLITZ,
         tags=True,
         sort="dateDesc",
         opening=True,
