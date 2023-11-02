@@ -38,11 +38,15 @@ def main() -> None:
     for game in games:
         if game.opening_name not in openings_and_game_urls.keys():
             openings_and_game_urls[game.opening_name] = []
-        openings_and_game_urls[game.opening_name].append(game.game_url)
+        add_game_url = False
         if game.result == "0-1":
             openings_and_negative_count[game.opening_name] += 1
+            add_game_url = True
         elif game.result == "1/2-1/2":
             openings_and_negative_count[game.opening_name] += 0.5
+            add_game_url = True
+        if add_game_url:
+            openings_and_game_urls[game.opening_name].append(game.game_url)
     openings_and_negative_count = dict(openings_and_negative_count)
 
     # Convert dict to sorted list of tuples
@@ -56,9 +60,10 @@ def main() -> None:
 
     info_body = ""
     for opening_name, score in send_openings:
-        info_body += f"\n__**{opening_name}**__: {score}\n\n"
-        for game_url in openings_and_game_urls[opening_name]:
-            info_body += f"{game_url}\n"
+        if score > 0:
+            info_body += f"\n__**{opening_name}**__: {score}\n\n"
+            for game_url in openings_and_game_urls[opening_name]:
+                info_body += f"{game_url}\n"
 
     description = f"{description}\n\n{info_body}"
 
