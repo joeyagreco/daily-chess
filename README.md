@@ -1,4 +1,13 @@
-# Daily Chess
+<div align="center">
+    <img src="https://raw.githubusercontent.com/joeyagreco/daily-chess/main/img/daily_chess_logo.png" alt="daily chess logo" width="300"/>
+
+Daily Chess Reviews.
+
+<a target="_blank" href="https://www.python.org/downloads/" title="Python version"><img src="https://img.shields.io/badge/python-%3E=_3.10-teal.svg"></a>
+![Last Commit](https://img.shields.io/github/last-commit/joeyagreco/daily-chess)
+<br>
+![Formatting Check](https://github.com/joeyagreco/daily-chess/actions/workflows/formatting-check.yml/badge.svg)
+</div>
 
 ## Quickstart
 
@@ -16,7 +25,7 @@
     DISCORD_WEBHOOK_URL
     DISCORD_DAILY_OPENINGS_TO_SEND
     ```
-    - **LICHESS_USERNAME** [string]: The username associated with your Lichess account
+    - **LICHESS_USERNAME** [string]: The username associated with your [Lichess](https://lichess.org/) account
     - **NUM_GAMES** [integer]: Your last n games to include in the analysis
     - **RATED** [boolean]: Whether to include only rated games
     - **PERF_TYPE** [PerfType]: The type of games to include. [OPTIONS](https://github.com/joeyagreco/daily-chess/blob/main/enumeration/PerfType.py)
