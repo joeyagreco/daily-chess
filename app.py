@@ -43,8 +43,7 @@ if __name__ == "__main__":
 
     # Convert dict to sorted list of tuples
     sorted_openings = sorted(openings_and_negative_count.items(), key=lambda x: x[1], reverse=True)
-
-    send_openings = sorted_openings[: DISCORD_DAILY_OPENINGS_TO_SEND + 1]
+    send_openings = sorted_openings[:DISCORD_DAILY_OPENINGS_TO_SEND]
 
     title = "DAILY CHESS UPDATE"
     description = (
@@ -53,7 +52,7 @@ if __name__ == "__main__":
 
     info_body = ""
     for opening_name, score in send_openings:
-        info_body += f"__**{opening_name}**__: {score}\n"
+        info_body += f"\n__**{opening_name}**__: {score}\n\n"
         for game_url in openings_and_game_urls[opening_name]:
             info_body += f"{game_url}\n"
 
