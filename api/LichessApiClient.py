@@ -25,7 +25,7 @@ class LichessApiClient(BaseApiClient):
         rated: Optional[bool] = None,
         perfType: Optional[PerfType] = None,
         tags: Optional[bool] = None,
-        sort: Optional[Sort] = None,  # TODO: enum
+        sort: Optional[Sort] = None,
         opening: Optional[bool] = None,
         finished: Optional[bool] = None,
     ) -> list[ChessGame]:
