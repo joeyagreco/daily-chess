@@ -44,19 +44,25 @@ def main() -> None:
 
     # Convert dict to sorted list of tuples
     sorted_openings = sorted(openings_and_net_elo.items(), key=lambda x: x[1], reverse=False)
-    send_openings = sorted_openings[:DISCORD_DAILY_OPENINGS_TO_SEND]
 
     fields = []
-    for opening_name, elo in send_openings:
-        value = f"\n({elo} elo)\n\n"
+    for opening_name, elo in sorted_openings:
+        modifier = "+" if elo > 0 else ""
+        value = f"\n({modifier}{elo} elo)\n\n"
         for game_url in openings_and_game_urls[opening_name]:
             value += f"{game_url}\n"
         fields.append({"name": opening_name, "value": value, "inline": False})
 
     worst_openings_embed = {
         "description": f"Your worst {DISCORD_DAILY_OPENINGS_TO_SEND} openings.",
-        "fields": fields,
+        "fields": fields[:DISCORD_DAILY_OPENINGS_TO_SEND],
         "color": HexColor.RED.value,
+    }
+
+    best_openings_embed = {
+        "description": f"Your best {DISCORD_DAILY_OPENINGS_TO_SEND} openings.",
+        "fields": fields[::-1][:-DISCORD_DAILY_OPENINGS_TO_SEND],
+        "color": HexColor.GREEN.value,
     }
 
     # calculate elo change
@@ -85,7 +91,8 @@ def main() -> None:
     }
     # send to discord
     send_discord_message(
-        webhook_url=WEBHOOK_URL, embeds=[title_embed, worst_openings_embed, elo_change_embed]
+        webhook_url=WEBHOOK_URL,
+        embeds=[title_embed, worst_openings_embed, best_openings_embed, elo_change_embed],
     )
 
 
