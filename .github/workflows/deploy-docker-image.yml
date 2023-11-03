@@ -21,6 +21,18 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
+      - name: Create .env file
+        run: |
+          echo "LICHESS_USERNAME=${{ secrets.LICHESS_USERNAME }}" >> .env
+          echo "NUM_GAMES=${{ secrets.NUM_GAMES }}" >> .env
+          echo "RATED=${{ secrets.RATED }}" >> .env
+          echo "PERF_TYPE=${{ secrets.PERF_TYPE }}" >> .env
+          echo "RUN_AT_TIME=${{ secrets.RUN_AT_TIME }}" >> .env
+          echo "DISCORD_WEBHOOK_URL=${{ secrets.DISCORD_WEBHOOK_URL }}" >> .env
+          echo "DISCORD_DAILY_OPENINGS_TO_SEND=${{ secrets.DISCORD_DAILY_OPENINGS_TO_SEND }}" >> .env
+
+        shell: bash
+
       - name: Extract metadata (tags, labels) for Docker
         id: meta
         uses: docker/metadata-action@v3
@@ -39,6 +51,8 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+          build-args: |
+            ENV_FILE=.env
 
       - name: Image digest
         run: echo ${{ steps.meta.outputs.digest }}
