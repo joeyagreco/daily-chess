@@ -15,6 +15,7 @@ Daily Chess Reviews.
     git clone https://github.com/joeyagreco/daily-chess.git
     ```
 2. Ensure your `.env` file is created and the variables are correctly set
+    - [ENV vars guide](https://github.com/joeyagreco/daily-chess#environment-variables)
 
 3. Install dependencies
 
@@ -29,6 +30,7 @@ Daily Chess Reviews.
 ## Run with Docker
 
 1. Ensure your `.env` file is created and the variables are correctly set
+    - [ENV vars guide](https://github.com/joeyagreco/daily-chess#environment-variables)
 2. Build Docker
     ```bash
     ./main build-docker
