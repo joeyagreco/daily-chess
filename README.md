@@ -42,6 +42,8 @@ Daily Chess Reviews.
 
 ## Environment Variables
 
+These can be set in an `.env` file in the root of the project or any other way you prefer to set environment variables
+
 | Variable Name                  	| Required 	| Type     	| Description                                                                                              	|
 |--------------------------------	|----------	|----------	|----------------------------------------------------------------------------------------------------------	|
 | LICHESS_USERNAME               	| true     	| string   	| The username associated with your [Lichess](https://lichess.org/) account                                                        	|
