@@ -33,13 +33,26 @@ def main() -> None:
 
     # calculate net elo for each opening
     openings_and_net_elo = defaultdict(float)
-    openings_and_game_urls: dict[str, list[str]] = {}
+
+    # holds urls, game outcome
+    openings_and_game_info: dict[str, list[dict]] = {}
     for game in games:
-        if game.opening_name not in openings_and_game_urls.keys():
-            openings_and_game_urls[game.opening_name] = []
+        if game.opening_name not in openings_and_game_info.keys():
+            openings_and_game_info[game.opening_name] = []
         openings_and_net_elo[game.opening_name] += game.elo_change_for_user(USERNAME)
-        if game.winner_username != USERNAME:
-            openings_and_game_urls[game.opening_name].append(game.game_url)
+        # if game.winner_username != USERNAME:
+        game_outcome = "TIE"
+        winner_username = game.winner_username
+        if winner_username is not None:
+            game_outcome = "WIN" if winner_username == USERNAME else "LOSS"
+
+        openings_and_game_info[game.opening_name].append(
+            {"url": game.game_url, "outcome": game_outcome}
+        )
+        # sort win -> tie -> loss
+        openings_and_game_info[game.opening_name].sort(
+            key=lambda x: {"WIN": 0, "TIE": 1, "LOSS": 2}[x["outcome"]]
+        )
     openings_and_net_elo = dict(openings_and_net_elo)
 
     # Convert dict to sorted list of tuples
@@ -49,8 +62,8 @@ def main() -> None:
     for opening_name, elo in sorted_openings:
         modifier = "+" if elo > 0 else ""
         value = f"\n({modifier}{elo} elo)\n\n"
-        for game_url in openings_and_game_urls[opening_name]:
-            value += f"{game_url}\n"
+        for game_info in openings_and_game_info[opening_name]:
+            value += f"[{game_info['outcome']}]({game_info['url']})\n"
         fields.append({"name": opening_name, "value": value, "inline": False})
 
     worst_openings_embed = {
@@ -61,7 +74,7 @@ def main() -> None:
 
     best_openings_embed = {
         "description": f"Your best {DISCORD_DAILY_OPENINGS_TO_SEND} openings.",
-        "fields": fields[::-1][:-DISCORD_DAILY_OPENINGS_TO_SEND],
+        "fields": fields[::-1][:DISCORD_DAILY_OPENINGS_TO_SEND],
         "color": HexColor.GREEN.value,
     }
 
@@ -97,8 +110,12 @@ def main() -> None:
 
 
 if __name__ == "__main__":
-    schedule.every().day.at(EnvironmentReader.get("RUN_AT_TIME")).do(main)
+    TEST = bool(EnvironmentReader.get("TEST"))
+    if TEST:
+        main()
+    else:
+        schedule.every().day.at(EnvironmentReader.get("RUN_AT_TIME")).do(main)
 
-    while True:
-        schedule.run_pending()
-        time.sleep(1)
+        while True:
+            schedule.run_pending()
+            time.sleep(1)
