@@ -60,11 +60,18 @@ def main() -> None:
 
     fields = []
     for opening_name, elo in sorted_openings:
+        outcome_counts = {
+            outcome: sum(
+                1 for game in openings_and_game_info[opening_name] if game["outcome"] == outcome
+            )
+            for outcome in ["WIN", "TIE", "LOSS"]
+        }
+        record_str = f"{outcome_counts['WIN']}-{outcome_counts['LOSS']}-{outcome_counts['TIE']}"
         modifier = "+" if elo > 0 else ""
-        value = f"\n({modifier}{elo} elo)\n\n"
+        value = f"\nELO: {modifier}{elo}\nGAMES PLAYED: {len(openings_and_game_info[opening_name])}\nRECORD: {record_str}\n\n"
         for game_info in openings_and_game_info[opening_name]:
             value += f"[{game_info['outcome']}]({game_info['url']})\n"
-        fields.append({"name": opening_name, "value": value, "inline": False})
+        fields.append({"name": opening_name, "value": value, "inline": True})
 
     worst_openings_embed = {
         "description": f"Your worst {DISCORD_DAILY_OPENINGS_TO_SEND} openings.",
