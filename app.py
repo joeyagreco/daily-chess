@@ -40,18 +40,15 @@ def main() -> None:
         if game.opening_name not in openings_and_game_info.keys():
             openings_and_game_info[game.opening_name] = []
         openings_and_net_elo[game.opening_name] += game.elo_change_for_user(USERNAME)
-        # if game.winner_username != USERNAME:
-        game_outcome = "TIE"
-        winner_username = game.winner_username
-        if winner_username is not None:
-            game_outcome = "WIN" if winner_username == USERNAME else "LOSS"
+
+        game_outcome = game.outcome_for_user(USERNAME).value
 
         openings_and_game_info[game.opening_name].append(
             {"url": game.game_url, "outcome": game_outcome}
         )
-        # sort win -> tie -> loss
+        # sort win -> loss -> tie
         openings_and_game_info[game.opening_name].sort(
-            key=lambda x: {"WIN": 0, "TIE": 1, "LOSS": 2}[x["outcome"]]
+            key=lambda x: {"WIN": 0, "LOSS": 1, "TIE": 2}[x["outcome"]]
         )
     openings_and_net_elo = dict(openings_and_net_elo)
 
@@ -67,8 +64,10 @@ def main() -> None:
             for outcome in ["WIN", "TIE", "LOSS"]
         }
         record_str = f"{outcome_counts['WIN']}-{outcome_counts['LOSS']}-{outcome_counts['TIE']}"
-        modifier = "+" if elo > 0 else ""
-        value = f"\nELO: {modifier}{elo}\nGAMES PLAYED: {len(openings_and_game_info[opening_name])}\nRECORD: {record_str}\n\n"
+        pre_modifier = "+" if elo > 0 else ""
+        emoji = ":chart_with_upwards_trend:" if elo > 0 else ":chart_with_downwards_trend:"
+        emoji = ":heavy_minus_sign:" if elo == 0 else emoji
+        value = f"\nELO: {pre_modifier}{elo} {emoji}\nGAMES PLAYED: {len(openings_and_game_info[opening_name])}\nRECORD: {record_str}\n\n"
         for game_info in openings_and_game_info[opening_name]:
             value += f"[{game_info['outcome']}]({game_info['url']})\n"
         fields.append({"name": opening_name, "value": value, "inline": True})
@@ -105,7 +104,7 @@ def main() -> None:
     elo_change_embed = {"description": f"Elo Recap", "fields": fields, "color": elo_dif_color}
 
     title_embed = {
-        "title": "DAILY CHESS UPDATE",
+        "title": "DAILY CHESS UPDATE :chess_pawn:",
         "description": f"Recap of your last {NUM_GAMES} games.",
         "color": HexColor.BLUE.value,
     }

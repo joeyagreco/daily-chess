@@ -5,6 +5,8 @@ from dataclasses import dataclass
 from datetime import datetime
 from typing import Optional
 
+from enumeration.ChessGameOutcome import ChessGameOutcome
+
 
 @dataclass(kw_only=True)
 class ChessGame:
@@ -64,6 +66,18 @@ class ChessGame:
             return elo
 
         raise Exception(f"Invalid username '{username}' for game.")
+
+    def outcome_for_user(self, username: str) -> ChessGameOutcome:
+        """
+        Returns the outcome of this game for the given username..
+        """
+        if username not in (self.white_username, self.black_username):
+            raise Exception(f"Invalid username '{username}' for game.")
+        winner_username = self.winner_username
+        outcome = ChessGameOutcome.TIE
+        if winner_username is not None:
+            outcome = ChessGameOutcome.WIN if winner_username == username else ChessGameOutcome.LOSS
+        return outcome
 
     def from_text(text: str) -> ChessGame:
         metadata = {key: value for key, value in re.findall(r'\[(.*?) "(.*?)"\]', text)}
