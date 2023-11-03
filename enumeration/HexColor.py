@@ -1,0 +1,40 @@
+from __future__ import annotations
+
+from enum import unique
+
+from enumeration.BaseEnum import BaseEnum
+
+
+@unique
+class HexColor(BaseEnum):
+    BLACK = 0x000000
+    BLUE = 0x0000FF
+    DARK_RED = 0x8B0000
+    GOLD = 0xFFD700
+    GREEN = 0x00FF00
+    LIGHT_BLUE = 0x6FBBD3
+    ORANGE = 0xFFA500
+    PURPLE = 0xA020F0
+    RED = 0xFF0000
+    TEAL = 0x008080
+    WHITE = 0xFFFFFF
+    YELLOW = 0xFFFF00
+    # special colors
+    CHAT_GPT = 0x00A67E
+    ESPN = 0xE52534
+    DRAKE_JACKET = 0xD94901
+    MERRIAM_WEBSTER_RED = 0xD71921
+    EIGHT = 0x9D00FF
+    YODA = 0x9CBB80
+
+    @staticmethod
+    def items() -> list[tuple[HexColor, str]]:
+        return [(member, member.name) for member in HexColor]
+
+    @classmethod
+    def from_str(cls, s: str) -> HexColor:
+        s_upper = s.upper()
+        for member, member_name in HexColor.items():
+            if member_name == s_upper:
+                return member
+        raise ValueError(f"'{s}' is not a valid HexColor.")

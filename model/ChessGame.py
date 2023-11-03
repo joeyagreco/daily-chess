@@ -37,7 +37,7 @@ class ChessGame:
             winner_username = self.black_username
         return winner_username
 
-    def elo_for_user(self, username: str) -> int:
+    def elo_change_for_user(self, username: str) -> int:
         """
         Returns the elo difference from this game for the given username.
         """
@@ -45,6 +45,23 @@ class ChessGame:
             return int(self.white_rating_dif)
         elif username == self.black_username:
             return int(self.black_rating_dif)
+
+        raise Exception(f"Invalid username '{username}' for game.")
+
+    def elo_for_user(self, username: str, *, after_game: bool = False) -> int:
+        """
+        Returns the elo at the time of this game for the given username.
+        """
+        if username == self.white_username:
+            elo = int(self.white_elo)
+            if after_game:
+                elo += self.elo_change_for_user(username)
+            return elo
+        elif username == self.black_username:
+            elo = int(self.black_elo)
+            if after_game:
+                elo += self.elo_change_for_user(username)
+            return elo
 
         raise Exception(f"Invalid username '{username}' for game.")
 
