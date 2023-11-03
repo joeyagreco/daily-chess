@@ -15,10 +15,14 @@ IF "%1"=="fmt" (
 ) ELSE IF "%1"=="docker-push" (
     REM tag and push docker image
     IF "%2"=="" (
+        echo Error: Dockerhub username not provided. Please specify a username.
+        exit /b
+    )
+    IF "%3"=="" (
         echo Error: Tag not provided. Please specify a tag.
         exit /b
     )
-    call :run_docker_push %2
+    call :run_docker_push %2 %3
 ) ELSE (
     echo Invalid flag. Please specify a valid flag.
 )
@@ -43,6 +47,6 @@ docker run daily_chess
 exit /b
 
 :run_docker_push
-docker tag daily_chess joeyagreco/daily-chess:%1
-docker push joeyagreco/daily-chess:%1
+docker tag daily_chess %1/daily-chess:%2
+docker push %1/daily-chess:%2
 exit /b
