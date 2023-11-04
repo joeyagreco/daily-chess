@@ -73,13 +73,13 @@ def main() -> None:
         fields.append({"name": opening_name, "value": value, "inline": True})
 
     worst_openings_embed = {
-        "description": f"Your worst {DISCORD_DAILY_OPENINGS_TO_SEND} openings.",
+        "description": f"Worst {DISCORD_DAILY_OPENINGS_TO_SEND} openings",
         "fields": fields[:DISCORD_DAILY_OPENINGS_TO_SEND],
         "color": HexColor.RED.value,
     }
 
     best_openings_embed = {
-        "description": f"Your best {DISCORD_DAILY_OPENINGS_TO_SEND} openings.",
+        "description": f"Best {DISCORD_DAILY_OPENINGS_TO_SEND} openings",
         "fields": fields[::-1][:DISCORD_DAILY_OPENINGS_TO_SEND],
         "color": HexColor.GREEN.value,
     }
