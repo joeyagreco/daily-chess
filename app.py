@@ -15,7 +15,6 @@ from util.EnvironmentReader import EnvironmentReader
 def main() -> None:
     USERNAME = EnvironmentReader.get("LICHESS_USERNAME")
     NUM_GAMES = int(EnvironmentReader.get("NUM_GAMES"))
-    RATED = bool(EnvironmentReader.get("RATED"))
     PERF_TYPE = PerfType.from_str(EnvironmentReader.get("PERF_TYPE"))
     WEBHOOK_URL = EnvironmentReader.get("DISCORD_WEBHOOK_URL")
     DISCORD_DAILY_OPENINGS_TO_SEND = int(EnvironmentReader.get("DISCORD_DAILY_OPENINGS_TO_SEND"))
@@ -23,7 +22,7 @@ def main() -> None:
     games: list[ChessGame] = get_games_for_user(
         USERNAME,
         max=NUM_GAMES,
-        rated=RATED,
+        rated=True,
         perfType=PERF_TYPE,
         tags=True,
         sort=Sort.DATE_DESC,
@@ -112,35 +111,29 @@ def main() -> None:
     ending_elo = games[0].elo_for_user(USERNAME, after_game=True)
     elo_dif = str(ending_elo - starting_elo)
     # format elo dif
-    elo_dif_color = HexColor.YELLOW.value
     if int(elo_dif) > 0:
-        elo_dif = f"+{elo_dif}"
-        elo_dif_color = HexColor.GREEN.value
+        elo_dif = f"+{elo_dif} :chart_with_upwards_trend:"
     elif int(elo_dif) < 0:
-        elo_dif_color = HexColor.RED.value
+        elo_dif = f"{elo_dif} :chart_with_downwards_trend:"
+    else:
+        elo_dif = f"{elo_dif} :heavy_minus_sign:"
 
-    fields = [
+    elo_recap_fields = [
         {"name": "Starting Elo", "value": str(starting_elo), "inline": False},
         {"name": "Ending Elo", "value": str(ending_elo), "inline": False},
         {"name": "Elo Change", "value": elo_dif, "inline": False},
     ]
-    elo_change_embed = {"description": f"Elo Recap", "fields": fields, "color": elo_dif_color}
 
     title_embed = {
         "title": "DAILY CHESS UPDATE :chess_pawn:",
         "description": f"Recap of your last {NUM_GAMES} games.",
+        "fields": elo_recap_fields,
         "color": HexColor.BLUE.value,
     }
     # send to discord
     send_discord_message(
         webhook_url=WEBHOOK_URL,
-        embeds=[
-            title_embed,
-            worst_openings_embed,
-            best_openings_embed,
-            most_played_openings_embed,
-            elo_change_embed,
-        ],
+        embeds=[title_embed, worst_openings_embed, best_openings_embed, most_played_openings_embed],
     )
 
 

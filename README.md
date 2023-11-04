@@ -45,7 +45,6 @@ These can be set in an `.env` file in the root of the project or any other way y
 |--------------------------------	|----------	|----------	|----------------------------------------------------------------------------------------------------------	|
 | LICHESS_USERNAME               	| true     	| string   	| The username associated with your [Lichess](https://lichess.org/) account                                                        	|
 | NUM_GAMES                      	| true     	| integer  	| Your last n games to be included in the analysis                                                         	|
-| RATED                          	| true     	| boolean  	| Whether to include only rated games                                                                      	|
 | PERF_TYPE                      	| true     	| PerfType 	| The type of games to include. [OPTIONS](https://github.com/joeyagreco/daily-chess/blob/main/enumeration/PerfType.py)                                                                  	|
 | RUN_AT_TIME                    	| true     	| str      	| The hour and minute to run this at daily. Uses military time (HH:MM)                                     	|
 | DISCORD_WEBHOOK_URL            	| true     	| str      	| The URL of the Discord webhook to call. [GUIDE](https://hookdeck.com/webhooks/platforms/how-to-get-started-with-discord-webhooks#discord-webhook-example)                                                            	|
