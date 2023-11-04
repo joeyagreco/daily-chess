@@ -25,7 +25,6 @@ jobs:
         run: |
           echo "LICHESS_USERNAME=${{ secrets.LICHESS_USERNAME }}" >> .env
           echo "NUM_GAMES=${{ secrets.NUM_GAMES }}" >> .env
-          echo "RATED=${{ secrets.RATED }}" >> .env
           echo "PERF_TYPE=${{ secrets.PERF_TYPE }}" >> .env
           echo "RUN_AT_TIME=${{ secrets.RUN_AT_TIME }}" >> .env
           echo "DISCORD_WEBHOOK_URL=${{ secrets.DISCORD_WEBHOOK_URL }}" >> .env
@@ -37,7 +36,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v3
         with:
-          images: joeyagreco/daily-chess
+          images: ${{ secrets.DOCKERHUB_USERNAME }}/daily-chess
           tags: |
             type=semver,pattern={{version}}
             type=ref,event=branch
