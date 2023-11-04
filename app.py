@@ -55,6 +55,9 @@ def main() -> None:
     # Convert dict to sorted list of tuples
     sorted_openings = sorted(openings_and_net_elo.items(), key=lambda x: x[1], reverse=False)
 
+    # store all openings and the frequency
+    opening_and_frequency_embeds = []
+
     fields = []
     for opening_name, elo in sorted_openings:
         outcome_counts = {
@@ -68,9 +71,23 @@ def main() -> None:
         emoji = ":chart_with_upwards_trend:" if elo > 0 else ":chart_with_downwards_trend:"
         emoji = ":heavy_minus_sign:" if elo == 0 else emoji
         value = f"\nELO: {pre_modifier}{elo} {emoji}\nGAMES PLAYED: {len(openings_and_game_info[opening_name])}\nRECORD: {record_str}\n\n"
+
+        opening_and_frequency_embeds.append(
+            {
+                "name": opening_name,
+                "value": str(len(openings_and_game_info[opening_name])),
+                "inline": False,
+            }
+        )
+
         for game_info in openings_and_game_info[opening_name]:
             value += f"[{game_info['outcome']}]({game_info['url']})\n"
         fields.append({"name": opening_name, "value": value, "inline": True})
+
+    # sort from most -> least frequent openings
+    opening_and_frequency_embeds = sorted(
+        opening_and_frequency_embeds, key=lambda x: int(x["value"]), reverse=True
+    )
 
     worst_openings_embed = {
         "description": f"Worst {DISCORD_DAILY_OPENINGS_TO_SEND} openings",
@@ -82,6 +99,12 @@ def main() -> None:
         "description": f"Best {DISCORD_DAILY_OPENINGS_TO_SEND} openings",
         "fields": fields[::-1][:DISCORD_DAILY_OPENINGS_TO_SEND],
         "color": HexColor.GREEN.value,
+    }
+
+    most_played_openings_embed = {
+        "description": f"Top {DISCORD_DAILY_OPENINGS_TO_SEND} most played openings",
+        "fields": opening_and_frequency_embeds[:DISCORD_DAILY_OPENINGS_TO_SEND],
+        "color": HexColor.LIGHT_BLUE.value,
     }
 
     # calculate elo change
@@ -111,7 +134,13 @@ def main() -> None:
     # send to discord
     send_discord_message(
         webhook_url=WEBHOOK_URL,
-        embeds=[title_embed, worst_openings_embed, best_openings_embed, elo_change_embed],
+        embeds=[
+            title_embed,
+            worst_openings_embed,
+            best_openings_embed,
+            most_played_openings_embed,
+            elo_change_embed,
+        ],
     )
 
 

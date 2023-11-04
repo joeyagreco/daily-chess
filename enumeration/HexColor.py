@@ -19,13 +19,6 @@ class HexColor(BaseEnum):
     TEAL = 0x008080
     WHITE = 0xFFFFFF
     YELLOW = 0xFFFF00
-    # special colors
-    CHAT_GPT = 0x00A67E
-    ESPN = 0xE52534
-    DRAKE_JACKET = 0xD94901
-    MERRIAM_WEBSTER_RED = 0xD71921
-    EIGHT = 0x9D00FF
-    YODA = 0x9CBB80
 
     @staticmethod
     def items() -> list[tuple[HexColor, str]]:
