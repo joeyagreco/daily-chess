@@ -39,21 +39,23 @@ class ChessGame:
         if "wins by checkmate" in self.moves:
             termination = ChessGameTermination.CHECKMATE
 
-        if termination in (ChessGameTermination.NORMAL, ChessGameTermination.TIME_FORFEIT):
-            if self.result == "1/2-1/2":
-                # draw, normal outcome
-                # only options (i think) are insufficient material, 50 moves, threefold repetition, and stalemate
-                if "Draw by stalemate" in self.moves:
-                    termination = ChessGameTermination.STALEMATE
-                elif "Draw by time and insufficient material" in self.moves:
-                    termination = ChessGameTermination.INSUFFICIENT_MATERIAL
-                # NOTE: do not have example API data for some outcomes, so they are not added yet
-                # NOTE: no support for 50 moves yet
-                # NOTE: no support for threefold repetition yet
-            else:
-                # non-draw, normal outcome
-                # only option (i think) is resignation
-                termination = ChessGameTermination.RESIGNATION
+        if self.result == "1/2-1/2" and termination in (
+            ChessGameTermination.NORMAL,
+            ChessGameTermination.TIME_FORFEIT,
+        ):
+            # draw, normal outcome
+            # only options (i think) are insufficient material, 50 moves, threefold repetition, and stalemate
+            if "Draw by stalemate" in self.moves:
+                termination = ChessGameTermination.STALEMATE
+            elif "Draw by time and insufficient material" in self.moves:
+                termination = ChessGameTermination.INSUFFICIENT_MATERIAL
+            # NOTE: do not have example API data for some outcomes, so they are not added yet
+            # NOTE: no support for 50 moves yet
+            # NOTE: no support for threefold repetition yet
+        elif self.result != "1/2-1/2" and termination == ChessGameTermination.NORMAL:
+            # non-draw, normal outcome
+            # only option (i think) is resignation
+            termination = ChessGameTermination.RESIGNATION
         return termination
 
     @property
