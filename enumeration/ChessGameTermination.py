@@ -7,7 +7,9 @@ from enumeration.BaseEnum import BaseEnum
 
 @unique
 class ChessGameTermination(BaseEnum):
+    CHECKMATE = "CHECKMATE"
     NORMAL = "NORMAL"
+    RESIGNATION = "RESIGNATION"
     TIME_FORFEIT = "TIME FORFEIT"
 
     @staticmethod

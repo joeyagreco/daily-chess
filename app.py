@@ -64,7 +64,11 @@ def main() -> None:
             lowest_elo_lost_username = game.winner_username
 
         openings_and_game_info[game.opening_name].append(
-            {"url": game.game_url, "outcome": game_outcome.value}
+            {
+                "url": game.game_url,
+                "outcome": game_outcome.value,
+                "termination": game.derived_termination.value,
+            }
         )
         # sort win -> loss -> tie
         openings_and_game_info[game.opening_name].sort(
@@ -101,7 +105,7 @@ def main() -> None:
         )
 
         for game_info in openings_and_game_info[opening_name]:
-            value += f"[{game_info['outcome']}]({game_info['url']})\n"
+            value += f"[{game_info['outcome']} ({game_info['termination']})]({game_info['url']})\n"
         fields.append({"name": opening_name, "value": value, "inline": True})
 
     # sort from most -> least frequent openings

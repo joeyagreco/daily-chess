@@ -29,6 +29,22 @@ class ChessGame:
     opening_name: Optional[str] = None
 
     @property
+    def derived_termination(self) -> ChessGameTermination:
+        """
+        Gives a more accurate termination than what Lichess provides.
+        Adds endings like "Checkmate" or "Resignation".
+        """
+        termination = self.termination
+        if termination == ChessGameTermination.NORMAL:
+            # check if this was a checkmate
+            if self.moves[-5] == "#":
+                termination = ChessGameTermination.CHECKMATE
+            # only other option (i think) is resignation
+            else:
+                termination = ChessGameTermination.RESIGNATION
+        return termination
+
+    @property
     def winner_username(self) -> Optional[str]:
         """
         Returns None for draws.
