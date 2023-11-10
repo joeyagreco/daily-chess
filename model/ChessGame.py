@@ -6,6 +6,7 @@ from datetime import datetime
 from typing import Optional
 
 from enumeration.ChessGameOutcome import ChessGameOutcome
+from enumeration.ChessGameTermination import ChessGameTermination
 
 
 @dataclass(kw_only=True)
@@ -23,7 +24,7 @@ class ChessGame:
     black_rating_dif: str
     variant: str
     time_control: str
-    termination: str
+    termination: ChessGameTermination
     moves: str
     opening_name: Optional[str] = None
 
@@ -136,6 +137,6 @@ class ChessGame:
             variant=metadata["Variant"],
             time_control=metadata["TimeControl"],
             opening_name=metadata.get("Opening"),
-            termination=metadata["Termination"],
+            termination=ChessGameTermination.from_str(metadata["Termination"]),
             moves=moves,
         )
