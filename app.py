@@ -4,12 +4,12 @@ from collections import defaultdict
 import schedule
 
 from enumeration.ChessGameOutcome import ChessGameOutcome
-from enumeration.ChessGameTermination import ChessGameTermination
+from enumeration.ChessStatus import ChessStatus
 from enumeration.HexColor import HexColor
 from enumeration.PerfType import PerfType
 from enumeration.Sort import Sort
-from model.ChessGame import ChessGame
-from service.chess_game import get_games_for_user
+from model.ChessGameV2 import ChessGameV2
+from service.chess_game import get_games_for_user_v2
 from util.discord import send_discord_message
 from util.EnvironmentReader import EnvironmentReader
 
@@ -21,16 +21,29 @@ def main() -> None:
     WEBHOOK_URL = EnvironmentReader.get("DISCORD_WEBHOOK_URL")
     DISCORD_DAILY_OPENINGS_TO_SEND = int(EnvironmentReader.get("DISCORD_DAILY_OPENINGS_TO_SEND"))
 
-    games: list[ChessGame] = get_games_for_user(
+    # games: list[ChessGame] = get_games_for_user(
+    #     USERNAME,
+    #     max=NUM_GAMES,
+    #     rated=True,
+    #     perfType=PERF_TYPE,
+    #     tags=True,
+    #     sort=Sort.DATE_DESC,
+    #     opening=True,
+    #     finished=True,
+    #     literate=True,
+    # )
+
+    games: list[ChessGameV2] = get_games_for_user_v2(
         USERNAME,
         max=NUM_GAMES,
         rated=True,
-        perfType=PERF_TYPE,
+        perf_type=PERF_TYPE,
         tags=True,
         sort=Sort.DATE_DESC,
         opening=True,
         finished=True,
         literate=True,
+        last_fen=True,
     )
 
     # calculate net elo for each opening
@@ -42,52 +55,48 @@ def main() -> None:
     highest_elo_beat_username = None
     lowest_elo_lost_username = None
 
-    # keep track of each game's outcome (termination)
-    termination_and_count = {}
-    for _, termination in ChessGameTermination.items():
-        termination_and_count[termination] = {}
+    # keep track of each game's outcome (status)
+    status_and_count = {}
+    for _, status in ChessStatus.items():
+        status_and_count[status] = {}
         for _, outcome in ChessGameOutcome.items():
-            termination_and_count[termination][outcome] = 0
+            status_and_count[status][outcome] = 0
 
     # holds urls, game outcome
     openings_and_game_info: dict[str, list[dict]] = {}
     for game in games:
-        if game.opening_name not in openings_and_game_info.keys():
-            openings_and_game_info[game.opening_name] = []
-        openings_and_net_elo[game.opening_name] += game.elo_change_for_user(USERNAME)
+        if game.opening.name not in openings_and_game_info.keys():
+            openings_and_game_info[game.opening.name] = []
+        openings_and_net_elo[game.opening.name] += game.get_chess_player(USERNAME).rating_diff
 
+        # get game outcome (status)
         game_outcome = game.outcome_for_user(USERNAME)
-        winner_elo = game.winner_elo
-        loser_elo = game.loser_elo
-        game_derived_termination = game.derived_termination
-
-        # get game outcome (termination)
-        termination_and_count[game_derived_termination.value][game_outcome.value] += 1
+        status_and_count[game.status.value][game_outcome.value] += 1
 
         # calculate best win / worst loss
-        if game_outcome == ChessGameOutcome.WIN and (
-            highest_elo_beat is None or loser_elo > highest_elo_beat
-        ):
-            highest_elo_beat = loser_elo
-            highest_elo_beat_username = game.loser_username
-        elif game_outcome == ChessGameOutcome.LOSS and (
-            lowest_elo_lost is None or winner_elo < lowest_elo_lost
-        ):
-            lowest_elo_lost = winner_elo
-            lowest_elo_lost_username = game.winner_username
+        if game_outcome != ChessGameOutcome.TIE:
+            winner_elo = game.winning_player.rating
+            loser_elo = game.losing_player.rating
 
-        openings_and_game_info[game.opening_name].append(
-            {
-                "url": game.game_url,
-                "outcome": game_outcome.value,
-                "termination": game_derived_termination.value,
-            }
+            if game_outcome == ChessGameOutcome.WIN and (
+                highest_elo_beat is None or loser_elo > highest_elo_beat
+            ):
+                highest_elo_beat = loser_elo
+                highest_elo_beat_username = game.losing_player.user.name
+            elif game_outcome == ChessGameOutcome.LOSS and (
+                lowest_elo_lost is None or winner_elo < lowest_elo_lost
+            ):
+                lowest_elo_lost = winner_elo
+                lowest_elo_lost_username = game.winning_player.user.name
+
+        openings_and_game_info[game.opening.name].append(
+            {"url": game.game_url, "outcome": game_outcome.value, "status": game.status.value}
         )
         # sort
         # primary sort on: win -> loss -> tie
-        # secondary sort on: termination
-        openings_and_game_info[game.opening_name].sort(
-            key=lambda x: ({"WIN": 0, "LOSS": 1, "TIE": 2}[x["outcome"]], x["termination"])
+        # secondary sort on: status
+        openings_and_game_info[game.opening.name].sort(
+            key=lambda x: ({"WIN": 0, "LOSS": 1, "TIE": 2}[x["outcome"]], x["status"])
         )
     openings_and_net_elo = dict(openings_and_net_elo)
 
@@ -120,7 +129,7 @@ def main() -> None:
         )
 
         for game_info in openings_and_game_info[opening_name]:
-            value += f"[{game_info['outcome']} ({game_info['termination']})]({game_info['url']})\n"
+            value += f"[{game_info['outcome']} ({game_info['status']})]({game_info['url']})\n"
         fields.append({"name": opening_name, "value": value, "inline": True})
 
     # sort from most -> least frequent openings
@@ -130,7 +139,7 @@ def main() -> None:
 
     termination_embed_fields = []
     # create embeds for each game outcome type (termination)
-    for termination, outcomes in termination_and_count.items():
+    for status, outcomes in status_and_count.items():
         # ensure that there was at least 1 game with this termination before adding it
         if (
             outcomes[ChessGameOutcome.WIN.value]
@@ -140,7 +149,7 @@ def main() -> None:
         ):
             termination_embed_fields.append(
                 {
-                    "name": termination,
+                    "name": status,
                     "value": f"{outcomes[ChessGameOutcome.WIN.value]}-{outcomes[ChessGameOutcome.LOSS.value]}-{outcomes[ChessGameOutcome.TIE.value]}",
                     "inline": False,
                 }
@@ -193,9 +202,10 @@ def main() -> None:
     }
 
     # calculate elo change
-    starting_elo = games[-1].elo_for_user(USERNAME)
-    ending_elo = games[0].elo_for_user(USERNAME, after_game=True)
+    starting_elo = games[-1].get_chess_player(USERNAME).rating
+    ending_elo = games[0].get_chess_player(USERNAME).rating_after_game
     elo_dif = str(ending_elo - starting_elo)
+
     # format elo dif
     if int(elo_dif) > 0:
         elo_dif = f"+{elo_dif} :chart_with_upwards_trend:"
@@ -216,6 +226,7 @@ def main() -> None:
         "fields": elo_recap_fields,
         "color": HexColor.BLUE.value,
     }
+
     # send to discord
     send_discord_message(
         webhook_url=WEBHOOK_URL,
