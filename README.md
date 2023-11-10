@@ -43,13 +43,13 @@ These can be set in an `.env` file in the root of the project or any other way y
 
 | Variable Name                  	| Required 	| Type     	| Description                                                                                              	|
 |--------------------------------	|----------	|----------	|----------------------------------------------------------------------------------------------------------	|
-| LICHESS_USERNAME               	| true     	| string   	| The username associated with your [Lichess](https://lichess.org/) account                                                        	|
-| NUM_GAMES                      	| true     	| integer  	| Your last n games to be included in the analysis                                                         	|
-| PERF_TYPE                      	| true     	| PerfType 	| The type of games to include. [OPTIONS](https://github.com/joeyagreco/daily-chess/blob/main/enumeration/PerfType.py)                                                                  	|
-| RUN_AT_TIME                    	| true     	| str      	| The hour and minute to run this at daily. Uses military time (HH:MM)                                     	|
-| DISCORD_WEBHOOK_URL            	| true     	| str      	| The URL of the Discord webhook to call. [GUIDE](https://hookdeck.com/webhooks/platforms/how-to-get-started-with-discord-webhooks#discord-webhook-example)                                                            	|
-| DISCORD_DAILY_OPENINGS_TO_SEND 	| true     	| integer  	| The number of openings to send each day (e.g. 3 would mean 3 openings are sent each day in the analysis) 	|
-| TEST                           	| false    	| boolean  	| Whether to run this in test mode or not.                                                                 	|
+| LICHESS_USERNAME               	| Yes     	| string   	| The username associated with your [Lichess](https://lichess.org/) account                                                        	|
+| NUM_GAMES                      	| Yes     	| integer  	| Your last n games to be included in the analysis                                                         	|
+| PERF_TYPE                      	| Yes     	| PerfType 	| The type of games to include. [OPTIONS](https://github.com/joeyagreco/daily-chess/blob/main/enumeration/PerfType.py)                                                                  	|
+| RUN_AT_TIME                    	| Yes     	| str      	| The hour and minute to run this at daily. Uses military time (HH:MM)                                     	|
+| DISCORD_WEBHOOK_URL            	| Yes     	| str      	| The URL of the Discord webhook to call. [GUIDE](https://hookdeck.com/webhooks/platforms/how-to-get-started-with-discord-webhooks#discord-webhook-example)                                                            	|
+| DISCORD_DAILY_OPENINGS_TO_SEND 	| Yes     	| integer  	| The number of openings to send each day (e.g. 3 would mean 3 openings are sent each day in the analysis) 	|
+| TEST                           	| No    	| boolean  	| Whether to run this in test mode or not.                                                                 	|
 
 ## Contributing
 
