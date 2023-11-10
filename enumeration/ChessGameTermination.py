@@ -8,8 +8,12 @@ from enumeration.BaseEnum import BaseEnum
 @unique
 class ChessGameTermination(BaseEnum):
     CHECKMATE = "CHECKMATE"
+    FIFTY_MOVES = "FIFTY MOVES"  # NOTE: not yet supported in logic
+    INSUFFICIENT_MATERIAL = "INSUFFICIENT MATERIAL"
     NORMAL = "NORMAL"
     RESIGNATION = "RESIGNATION"
+    STALEMATE = "STALEMATE"
+    THREEFOLD_REPETITION = "THREEFOLD REPETITION"  # NOTE: not yet supported in logic
     TIME_FORFEIT = "TIME FORFEIT"
 
     @staticmethod

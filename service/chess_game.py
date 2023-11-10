@@ -16,6 +16,7 @@ def get_games_for_user(
     sort: Optional[Sort] = None,
     opening: Optional[bool] = None,
     finished: Optional[bool] = None,
+    literate: Optional[bool] = None
 ) -> ChessGame:
     lichess_api_client = LichessApiClient()
     return lichess_api_client.get_games_for_user(
@@ -27,4 +28,5 @@ def get_games_for_user(
         sort=sort,
         opening=opening,
         finished=finished,
+        literate=literate,
     )

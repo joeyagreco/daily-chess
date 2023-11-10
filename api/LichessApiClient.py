@@ -28,6 +28,7 @@ class LichessApiClient(BaseApiClient):
         sort: Optional[Sort] = None,
         opening: Optional[bool] = None,
         finished: Optional[bool] = None,
+        literate: Optional[bool] = None,
     ) -> list[ChessGame]:
         ...
         url = f"{cls.__BASE_URL}{cls.__GAMES_ROUTE}{cls.__USER_ROUTE}/{username}"
@@ -47,6 +48,8 @@ class LichessApiClient(BaseApiClient):
             params["opening"] = opening
         if finished is not None:
             params["finished"] = finished
+        if literate is not None:
+            params["literate"] = literate
 
         url = cls._build_url_with_params(url, params)
 

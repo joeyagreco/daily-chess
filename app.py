@@ -4,6 +4,7 @@ from collections import defaultdict
 import schedule
 
 from enumeration.ChessGameOutcome import ChessGameOutcome
+from enumeration.ChessGameTermination import ChessGameTermination
 from enumeration.HexColor import HexColor
 from enumeration.PerfType import PerfType
 from enumeration.Sort import Sort
@@ -29,6 +30,7 @@ def main() -> None:
         sort=Sort.DATE_DESC,
         opening=True,
         finished=True,
+        literate=True,
     )
 
     # calculate net elo for each opening
@@ -39,6 +41,11 @@ def main() -> None:
     lowest_elo_lost = None
     highest_elo_beat_username = None
     lowest_elo_lost_username = None
+
+    # keep track of each game's outcome (termination)
+    termination_and_count = {}
+    for _, termination in ChessGameTermination.items():
+        termination_and_count[termination] = {"WIN": 0, "LOSS": 0, "TIE": 0}
 
     # holds urls, game outcome
     openings_and_game_info: dict[str, list[dict]] = {}
@@ -72,12 +79,9 @@ def main() -> None:
         )
         # sort
         # primary sort on: win -> loss -> tie
-        # secondary sort on: checkmate -> resignation -> time forfeit
+        # secondary sort on: termination
         openings_and_game_info[game.opening_name].sort(
-            key=lambda x: (
-                {"WIN": 0, "LOSS": 1, "TIE": 2}[x["outcome"]],
-                {"CHECKMATE": 0, "RESIGNATION": 1, "TIME FORFEIT": 2}[x["termination"]],
-            )
+            key=lambda x: ({"WIN": 0, "LOSS": 1, "TIE": 2}[x["outcome"]], x["termination"])
         )
     openings_and_net_elo = dict(openings_and_net_elo)
 
