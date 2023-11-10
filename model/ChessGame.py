@@ -36,10 +36,10 @@ class ChessGame:
         """
         termination = self.termination
         # check if this was a checkmate
-        if self.moves[-5] == "#":
+        if "wins by checkmate" in self.moves:
             termination = ChessGameTermination.CHECKMATE
 
-        if termination == ChessGameTermination.NORMAL:
+        if termination in (ChessGameTermination.NORMAL, ChessGameTermination.TIME_FORFEIT):
             if self.result == "1/2-1/2":
                 # draw, normal outcome
                 # only options (i think) are insufficient material, 50 moves, threefold repetition, and stalemate

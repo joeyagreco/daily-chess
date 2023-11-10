@@ -45,7 +45,9 @@ def main() -> None:
     # keep track of each game's outcome (termination)
     termination_and_count = {}
     for _, termination in ChessGameTermination.items():
-        termination_and_count[termination] = {"WIN": 0, "LOSS": 0, "TIE": 0}
+        termination_and_count[termination] = {}
+        for _, outcome in ChessGameOutcome.items():
+            termination_and_count[termination][outcome] = 0
 
     # holds urls, game outcome
     openings_and_game_info: dict[str, list[dict]] = {}
@@ -57,6 +59,10 @@ def main() -> None:
         game_outcome = game.outcome_for_user(USERNAME)
         winner_elo = game.winner_elo
         loser_elo = game.loser_elo
+        game_derived_termination = game.derived_termination
+
+        # get game outcome (termination)
+        termination_and_count[game_derived_termination.value][game_outcome.value] += 1
 
         # calculate best win / worst loss
         if game_outcome == ChessGameOutcome.WIN and (
@@ -74,7 +80,7 @@ def main() -> None:
             {
                 "url": game.game_url,
                 "outcome": game_outcome.value,
-                "termination": game.derived_termination.value,
+                "termination": game_derived_termination.value,
             }
         )
         # sort
@@ -122,6 +128,24 @@ def main() -> None:
         opening_and_frequency_embeds, key=lambda x: int(x["value"]), reverse=True
     )
 
+    termination_embed_fields = []
+    # create embeds for each game outcome type (termination)
+    for termination, outcomes in termination_and_count.items():
+        # ensure that there was at least 1 game with this termination before adding it
+        if (
+            outcomes[ChessGameOutcome.WIN.value]
+            + outcomes[ChessGameOutcome.LOSS.value]
+            + outcomes[ChessGameOutcome.TIE.value]
+            > 0
+        ):
+            termination_embed_fields.append(
+                {
+                    "name": termination,
+                    "value": f"{outcomes[ChessGameOutcome.WIN.value]}-{outcomes[ChessGameOutcome.LOSS.value]}-{outcomes[ChessGameOutcome.TIE.value]}",
+                    "inline": False,
+                }
+            )
+
     worst_openings_embed = {
         "description": f"Worst {DISCORD_DAILY_OPENINGS_TO_SEND} openings",
         "fields": fields[:DISCORD_DAILY_OPENINGS_TO_SEND],
@@ -157,6 +181,12 @@ def main() -> None:
         "color": HexColor.PURPLE.value,
     }
 
+    terminations_embed = {
+        "description": "Record By Outcome",
+        "fields": termination_embed_fields,
+        "color": HexColor.TEAL.value,
+    }
+
     # calculate elo change
     starting_elo = games[-1].elo_for_user(USERNAME)
     ending_elo = games[0].elo_for_user(USERNAME, after_game=True)
@@ -186,6 +216,7 @@ def main() -> None:
         webhook_url=WEBHOOK_URL,
         embeds=[
             title_embed,
+            terminations_embed,
             best_win_and_worst_loss_embed,
             worst_openings_embed,
             best_openings_embed,
