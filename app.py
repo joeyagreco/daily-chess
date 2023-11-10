@@ -125,17 +125,17 @@ def main() -> None:
         opening_and_frequency_embeds, key=lambda x: int(x["value"]), reverse=True
     )
 
-    termination_embed_fields = []
-    # create embeds for each game outcome type (termination)
+    status_embed_fields = []
+    # create embeds for each game outcome type (status)
     for status, outcomes in status_and_count.items():
-        # ensure that there was at least 1 game with this termination before adding it
+        # ensure that there was at least 1 game with this status before adding it
         if (
             outcomes[ChessGameOutcome.WIN.value]
             + outcomes[ChessGameOutcome.LOSS.value]
             + outcomes[ChessGameOutcome.TIE.value]
             > 0
         ):
-            termination_embed_fields.append(
+            status_embed_fields.append(
                 {
                     "name": status,
                     "value": f"{outcomes[ChessGameOutcome.WIN.value]}-{outcomes[ChessGameOutcome.LOSS.value]}-{outcomes[ChessGameOutcome.TIE.value]}",
@@ -144,9 +144,7 @@ def main() -> None:
             )
 
     # sort embeds from most -> least games
-    termination_embed_fields.sort(
-        key=lambda x: sum(int(v) for v in x["value"].split("-")), reverse=True
-    )
+    status_embed_fields.sort(key=lambda x: sum(int(v) for v in x["value"].split("-")), reverse=True)
 
     worst_openings_embed = {
         "description": f"Worst {DISCORD_DAILY_OPENINGS_TO_SEND} openings",
@@ -185,7 +183,7 @@ def main() -> None:
 
     terminations_embed = {
         "description": "Record By Outcome",
-        "fields": termination_embed_fields,
+        "fields": status_embed_fields,
         "color": HexColor.TEAL.value,
     }
 
