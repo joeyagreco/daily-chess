@@ -13,26 +13,14 @@ from service.chess_game import get_games_for_user_v2
 from util.discord import send_discord_message
 from util.EnvironmentReader import EnvironmentReader
 
+USERNAME = EnvironmentReader.get("LICHESS_USERNAME")
+NUM_GAMES = int(EnvironmentReader.get("NUM_GAMES"))
+PERF_TYPE = PerfType.from_str(EnvironmentReader.get("PERF_TYPE"))
+WEBHOOK_URL = EnvironmentReader.get("DISCORD_WEBHOOK_URL")
+DISCORD_DAILY_OPENINGS_TO_SEND = int(EnvironmentReader.get("DISCORD_DAILY_OPENINGS_TO_SEND"))
+
 
 def main() -> None:
-    USERNAME = EnvironmentReader.get("LICHESS_USERNAME")
-    NUM_GAMES = int(EnvironmentReader.get("NUM_GAMES"))
-    PERF_TYPE = PerfType.from_str(EnvironmentReader.get("PERF_TYPE"))
-    WEBHOOK_URL = EnvironmentReader.get("DISCORD_WEBHOOK_URL")
-    DISCORD_DAILY_OPENINGS_TO_SEND = int(EnvironmentReader.get("DISCORD_DAILY_OPENINGS_TO_SEND"))
-
-    # games: list[ChessGame] = get_games_for_user(
-    #     USERNAME,
-    #     max=NUM_GAMES,
-    #     rated=True,
-    #     perfType=PERF_TYPE,
-    #     tags=True,
-    #     sort=Sort.DATE_DESC,
-    #     opening=True,
-    #     finished=True,
-    #     literate=True,
-    # )
-
     games: list[ChessGameV2] = get_games_for_user_v2(
         USERNAME,
         max=NUM_GAMES,
@@ -249,5 +237,11 @@ if __name__ == "__main__":
         schedule.every().day.at(EnvironmentReader.get("RUN_AT_TIME")).do(main)
 
         while True:
-            schedule.run_pending()
-            time.sleep(1)
+            try:
+                schedule.run_pending()
+                time.sleep(1)
+            except Exception as e:
+                send_discord_message(
+                    webhook_url=WEBHOOK_URL,
+                    embeds=[{"title": "ERROR", "description": e, "color": HexColor.RED.value}],
+                )
