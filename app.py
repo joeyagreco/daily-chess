@@ -70,9 +70,14 @@ def main() -> None:
                 "termination": game.derived_termination.value,
             }
         )
-        # sort win -> loss -> tie
+        # sort
+        # primary sort on: win -> loss -> tie
+        # secondary sort on: checkmate -> resignation -> time forfeit
         openings_and_game_info[game.opening_name].sort(
-            key=lambda x: {"WIN": 0, "LOSS": 1, "TIE": 2}[x["outcome"]]
+            key=lambda x: (
+                {"WIN": 0, "LOSS": 1, "TIE": 2}[x["outcome"]],
+                {"CHECKMATE": 0, "RESIGNATION": 1, "TIME FORFEIT": 2}[x["termination"]],
+            )
         )
     openings_and_net_elo = dict(openings_and_net_elo)
 
