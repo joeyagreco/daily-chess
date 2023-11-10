@@ -39,6 +39,44 @@ class ChessGame:
             winner_username = self.black_username
         return winner_username
 
+    @property
+    def loser_username(self) -> Optional[str]:
+        """
+        Returns None for draws.
+        """
+        loser_username = None
+        if self.result == "1-0":
+            loser_username = self.black_username
+        elif self.result == "0-1":
+            loser_username = self.white_username
+        return loser_username
+
+    @property
+    def winner_elo(self) -> Optional[int]:
+        """
+        Returns the elo for the game winner.
+        Returns None for draws.
+        """
+        winner_elo = None
+        if self.result == "1-0":
+            winner_elo = self.white_elo
+        elif self.result == "0-1":
+            winner_elo = self.black_elo
+        return winner_elo
+
+    @property
+    def loser_elo(self) -> Optional[int]:
+        """
+        Returns the elo for the game loser.
+        Returns None for draws.
+        """
+        loser_elo = None
+        if self.result == "1-0":
+            loser_elo = self.black_elo
+        elif self.result == "0-1":
+            loser_elo = self.white_elo
+        return loser_elo
+
     def elo_change_for_user(self, username: str) -> int:
         """
         Returns the elo difference from this game for the given username.

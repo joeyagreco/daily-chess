@@ -3,6 +3,7 @@ from collections import defaultdict
 
 import schedule
 
+from enumeration.ChessGameOutcome import ChessGameOutcome
 from enumeration.HexColor import HexColor
 from enumeration.PerfType import PerfType
 from enumeration.Sort import Sort
@@ -33,6 +34,12 @@ def main() -> None:
     # calculate net elo for each opening
     openings_and_net_elo = defaultdict(float)
 
+    # calculate best and worst user/elo beat and lost to
+    highest_elo_beat = None
+    lowest_elo_lost = None
+    highest_elo_beat_username = None
+    lowest_elo_lost_username = None
+
     # holds urls, game outcome
     openings_and_game_info: dict[str, list[dict]] = {}
     for game in games:
@@ -40,10 +47,24 @@ def main() -> None:
             openings_and_game_info[game.opening_name] = []
         openings_and_net_elo[game.opening_name] += game.elo_change_for_user(USERNAME)
 
-        game_outcome = game.outcome_for_user(USERNAME).value
+        game_outcome = game.outcome_for_user(USERNAME)
+        winner_elo = game.winner_elo
+        loser_elo = game.loser_elo
+
+        # calculate best win / worst loss
+        if game_outcome == ChessGameOutcome.WIN and (
+            highest_elo_beat is None or loser_elo > highest_elo_beat
+        ):
+            highest_elo_beat = loser_elo
+            highest_elo_beat_username = game.loser_username
+        elif game_outcome == ChessGameOutcome.LOSS and (
+            lowest_elo_lost is None or winner_elo < lowest_elo_lost
+        ):
+            lowest_elo_lost = winner_elo
+            lowest_elo_lost_username = game.winner_username
 
         openings_and_game_info[game.opening_name].append(
-            {"url": game.game_url, "outcome": game_outcome}
+            {"url": game.game_url, "outcome": game_outcome.value}
         )
         # sort win -> loss -> tie
         openings_and_game_info[game.opening_name].sort(
@@ -106,6 +127,23 @@ def main() -> None:
         "color": HexColor.LIGHT_BLUE.value,
     }
 
+    best_win_and_worst_loss_embed = {
+        "description": f"Best Win and Worst Loss",
+        "fields": [
+            {
+                "name": "Best Win",
+                "value": f"{highest_elo_beat_username}: {highest_elo_beat}",
+                "inline": True,
+            },
+            {
+                "name": "Worst Loss",
+                "value": f"{lowest_elo_lost_username}: {lowest_elo_lost}",
+                "inline": True,
+            },
+        ],
+        "color": HexColor.PURPLE.value,
+    }
+
     # calculate elo change
     starting_elo = games[-1].elo_for_user(USERNAME)
     ending_elo = games[0].elo_for_user(USERNAME, after_game=True)
@@ -133,7 +171,13 @@ def main() -> None:
     # send to discord
     send_discord_message(
         webhook_url=WEBHOOK_URL,
-        embeds=[title_embed, worst_openings_embed, best_openings_embed, most_played_openings_embed],
+        embeds=[
+            title_embed,
+            best_win_and_worst_loss_embed,
+            worst_openings_embed,
+            best_openings_embed,
+            most_played_openings_embed,
+        ],
     )
 
 
