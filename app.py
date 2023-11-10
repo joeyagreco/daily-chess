@@ -146,6 +146,11 @@ def main() -> None:
                 }
             )
 
+    # sort embeds from most -> least games
+    termination_embed_fields.sort(
+        key=lambda x: sum(int(v) for v in x["value"].split("-")), reverse=True
+    )
+
     worst_openings_embed = {
         "description": f"Worst {DISCORD_DAILY_OPENINGS_TO_SEND} openings",
         "fields": fields[:DISCORD_DAILY_OPENINGS_TO_SEND],
