@@ -10,6 +10,7 @@ from enumeration.PerfType import PerfType
 from enumeration.Sort import Sort
 from model.ChessGameV2 import ChessGameV2
 from service.chess_game import get_games_for_user_v2
+from service.evaluate_game import get_worst_move_for_user
 from util.discord import send_discord_message
 from util.EnvironmentReader import EnvironmentReader
 
@@ -18,6 +19,7 @@ NUM_GAMES = int(EnvironmentReader.get("NUM_GAMES"))
 PERF_TYPE = PerfType.from_str(EnvironmentReader.get("PERF_TYPE"))
 WEBHOOK_URL = EnvironmentReader.get("DISCORD_WEBHOOK_URL")
 DISCORD_DAILY_OPENINGS_TO_SEND = int(EnvironmentReader.get("DISCORD_DAILY_OPENINGS_TO_SEND"))
+EVALUATION_DEPTH = int(EnvironmentReader.get("EVALUATION_DEPTH"))
 
 
 def main() -> None:
@@ -51,10 +53,10 @@ def main() -> None:
             status_and_count[status][outcome] = 0
 
     # holds urls, game outcome
-    openings_and_game_info: dict[str, list[dict]] = {}
+    openings_and_game: dict[str, list[ChessGameV2]] = {}
     for game in games:
-        if game.opening.name not in openings_and_game_info.keys():
-            openings_and_game_info[game.opening.name] = []
+        if game.opening.name not in openings_and_game.keys():
+            openings_and_game[game.opening.name] = []
         openings_and_net_elo[game.opening.name] += game.get_chess_player(USERNAME).rating_diff
 
         # get game outcome (status)
@@ -77,14 +79,22 @@ def main() -> None:
                 lowest_elo_lost = winner_elo
                 lowest_elo_lost_username = game.winning_player.user.name
 
-        openings_and_game_info[game.opening.name].append(
-            {"url": game.game_url, "outcome": game_outcome.value, "status": game.status.value}
-        )
+        # openings_and_game[game.opening.name].append(
+        #     {"url": game.game_url, "outcome": game_outcome.value, "status": game.status.value}
+        # )
+        openings_and_game[game.opening.name].append(game)
         # sort
         # primary sort on: win -> loss -> tie
         # secondary sort on: status
-        openings_and_game_info[game.opening.name].sort(
-            key=lambda x: ({"WIN": 0, "LOSS": 1, "TIE": 2}[x["outcome"]], x["status"])
+        openings_and_game[game.opening.name].sort(
+            key=lambda game: (
+                {
+                    ChessGameOutcome.WIN.value: 0,
+                    ChessGameOutcome.LOSS.value: 1,
+                    ChessGameOutcome.TIE.value: 2,
+                }[game.outcome_for_user(USERNAME).value],
+                game.status.value,
+            )
         )
     openings_and_net_elo = dict(openings_and_net_elo)
 
@@ -98,26 +108,38 @@ def main() -> None:
     for opening_name, elo in sorted_openings:
         outcome_counts = {
             outcome: sum(
-                1 for game in openings_and_game_info[opening_name] if game["outcome"] == outcome
+                1
+                for game in openings_and_game[opening_name]
+                if game.outcome_for_user(USERNAME) == outcome
             )
-            for outcome in ["WIN", "TIE", "LOSS"]
+            for outcome in [ChessGameOutcome.WIN, ChessGameOutcome.LOSS, ChessGameOutcome.TIE]
         }
-        record_str = f"{outcome_counts['WIN']}-{outcome_counts['LOSS']}-{outcome_counts['TIE']}"
+
+        record_str = f"{outcome_counts[ChessGameOutcome.WIN]}-{outcome_counts[ChessGameOutcome.LOSS]}-{outcome_counts[ChessGameOutcome.TIE]}"
         pre_modifier = "+" if elo > 0 else ""
         emoji = ":chart_with_upwards_trend:" if elo > 0 else ":chart_with_downwards_trend:"
         emoji = ":heavy_minus_sign:" if elo == 0 else emoji
-        value = f"\nELO: {pre_modifier}{elo} {emoji}\nGAMES PLAYED: {len(openings_and_game_info[opening_name])}\nRECORD: {record_str}\n\n"
+        value = f"\nELO: {pre_modifier}{elo} {emoji}\nGAMES PLAYED: {len(openings_and_game[opening_name])}\nRECORD: {record_str}\n\n"
 
         opening_and_frequency_embeds.append(
             {
                 "name": opening_name,
-                "value": str(len(openings_and_game_info[opening_name])),
+                "value": str(len(openings_and_game[opening_name])),
                 "inline": False,
             }
         )
 
-        for game_info in openings_and_game_info[opening_name]:
-            value += f"[{game_info['outcome']} ({game_info['status']})]({game_info['url']})\n"
+        for game in openings_and_game[opening_name]:
+            outcome_for_user = game.outcome_for_user(USERNAME)
+            eval_str = ""
+            # get worst move
+            worst_move = get_worst_move_for_user(
+                chess_game=game, username=USERNAME, evaluation_depth=EVALUATION_DEPTH
+            )
+            eval_str = f"[:x: {worst_move.actual_move}, :white_check_mark: {worst_move.engine_best_move}]({worst_move.url})"
+            value += (
+                f"[{outcome_for_user.value} ({game.status.value})]({game.game_url}) {eval_str}\n"
+            )
         fields.append({"name": opening_name, "value": value, "inline": True})
 
     # sort from most -> least frequent openings

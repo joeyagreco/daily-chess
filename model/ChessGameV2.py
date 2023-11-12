@@ -5,7 +5,6 @@ from typing import Optional
 
 from enumeration.ChessColor import ChessColor
 from enumeration.ChessGameOutcome import ChessGameOutcome
-from enumeration.ChessGameTermination import ChessGameTermination
 from enumeration.ChessStatus import ChessStatus
 from model.abstract.DictDeserializable import DictDeserializable
 from model.ChessClock import ChessClock
@@ -34,36 +33,6 @@ class ChessGameV2(DictDeserializable):
     @property
     def game_url(self) -> str:
         return f"https://lichess.org/{self.id}"
-
-    @property
-    def derived_termination(self) -> ChessGameTermination:
-        """
-        Gives a more accurate termination than what Lichess provides.
-        Adds endings like "Checkmate" or "Resignation".
-        """
-        termination = self.termination
-        # check if this was a checkmate
-        if "wins by checkmate" in self.moves:
-            termination = ChessGameTermination.CHECKMATE
-
-        if self.result == "1/2-1/2" and termination in (
-            ChessGameTermination.NORMAL,
-            ChessGameTermination.TIME_FORFEIT,
-        ):
-            # draw, normal outcome
-            # only options (i think) are insufficient material, 50 moves, threefold repetition, and stalemate
-            if "Draw by stalemate" in self.moves:
-                termination = ChessGameTermination.STALEMATE
-            elif "Draw by time and insufficient material" in self.moves:
-                termination = ChessGameTermination.INSUFFICIENT_MATERIAL
-            # NOTE: do not have example API data for some outcomes, so they are not added yet
-            # NOTE: no support for 50 moves yet
-            # NOTE: no support for threefold repetition yet
-        elif self.result != "1/2-1/2" and termination == ChessGameTermination.NORMAL:
-            # non-draw, normal outcome
-            # only option (i think) is resignation
-            termination = ChessGameTermination.RESIGNATION
-        return termination
 
     @property
     def ended_in_draw(self) -> bool:
@@ -118,6 +87,17 @@ class ChessGameV2(DictDeserializable):
                 else ChessGameOutcome.LOSS
             )
         return outcome
+
+    def color_for_user(self, username: str) -> ChessColor:
+        """
+        Returns the color of this game for the given username..
+        """
+        if username not in (self.players.white.user.name, self.players.black.user.name):
+            raise Exception(f"Invalid username '{username}' for game.")
+        color = ChessColor.WHITE
+        if self.players.black.user.name == username:
+            color = ChessColor.BLACK
+        return color
 
     @staticmethod
     def from_dict(d: dict) -> ChessGameV2:
