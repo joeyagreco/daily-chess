@@ -3,6 +3,7 @@ from collections import defaultdict
 
 import schedule
 
+from enumeration.ChessColor import ChessColor
 from enumeration.ChessGameOutcome import ChessGameOutcome
 from enumeration.ChessStatus import ChessStatus
 from enumeration.HexColor import HexColor
@@ -148,10 +149,14 @@ def main() -> None:
             stockfish_executable_name=STOCKFISH_EXECUTABLE_NAME,
         )
         eval_str = f"[ :x: {worst_move.actual_move} -> :white_check_mark: {worst_move.engine_best_move}]({worst_move.url})"
+        user_color = game.color_for_user(USERNAME)
         game_eval_embeds.append(
             {
-                "description": f"[{ChessGameOutcome.LOSS.value} ({game.status.value})]({game.game_url}){eval_str}\n",
-                "color": HexColor.ORANGE.value,
+                "title": f"{ChessGameOutcome.LOSS.value} ({game.status.value}) as {user_color.value}",
+                "description": f"{eval_str}\n\n[GAME]({game.game_url})",
+                "color": HexColor.WHITE.value
+                if user_color == ChessColor.WHITE
+                else HexColor.BLACK.value,
                 "footer": {"text": f"{i+1}/{len(evaluate_games)}"},
             }
         )

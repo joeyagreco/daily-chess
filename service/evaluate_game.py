@@ -58,7 +58,7 @@ def get_worst_move_for_user(
 
             current_change = current_eval - last_eval
             move_eval = MoveEval(
-                actual_move=move, eval_change=current_change, fen_before_move=pre_move_fen
+                actual_move=board.peek(), eval_change=current_change, fen_before_move=pre_move_fen
             )
             if current_change < worst_change:
                 worst_change = current_change
