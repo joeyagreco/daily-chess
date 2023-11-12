@@ -9,7 +9,7 @@ from model.MoveEval import MoveEval
 
 
 def get_worst_move_for_user(
-    *, chess_game: ChessGameV2, username: str, evaluation_depth: int
+    *, chess_game: ChessGameV2, username: str, evaluation_depth: int, stockfish_executable_name: str
 ) -> MoveEval:
     """
     Returns the worst move from the given game for the user with the given username.
@@ -19,7 +19,7 @@ def get_worst_move_for_user(
         # change to be a positive eval if good and negative eval if bad for both white and black
         return ev if evaluate_for_white else -ev
 
-    stockfish_relative_path = "../bin/stockfish"
+    stockfish_relative_path = f"../bin/{stockfish_executable_name}"
     stockfish_absolute_path = os.path.abspath(
         os.path.join(os.path.dirname(__file__), stockfish_relative_path)
     )
@@ -40,7 +40,7 @@ def get_worst_move_for_user(
     evaluate_for_white = chess_game.color_for_user(username) == ChessColor.WHITE
 
     white_turn = True
-    for i, move in enumerate(moves):
+    for move in moves:
         if worst_change <= stop_after_eval_change_of:
             break
         pre_move_fen = board.fen()

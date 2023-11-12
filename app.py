@@ -22,6 +22,7 @@ PERF_TYPE = PerfType.from_str(EnvironmentReader.get("PERF_TYPE"))
 WEBHOOK_URL = EnvironmentReader.get("DISCORD_WEBHOOK_URL")
 DISCORD_DAILY_OPENINGS_TO_SEND = int(EnvironmentReader.get("DISCORD_DAILY_OPENINGS_TO_SEND"))
 EVALUATION_DEPTH = int(EnvironmentReader.get("EVALUATION_DEPTH"))
+STOCKFISH_EXECUTABLE_NAME = "stockfish.exe" if TEST else "stockfish"
 
 
 def main() -> None:
@@ -133,7 +134,10 @@ def main() -> None:
             eval_str = ""
             # get worst move
             worst_move = get_worst_move_for_user(
-                chess_game=game, username=USERNAME, evaluation_depth=EVALUATION_DEPTH
+                chess_game=game,
+                username=USERNAME,
+                evaluation_depth=EVALUATION_DEPTH,
+                stockfish_executable_name=STOCKFISH_EXECUTABLE_NAME,
             )
             eval_str = f"[:x: {worst_move.actual_move}, :white_check_mark: {worst_move.engine_best_move}]({worst_move.url})"
             value += (
