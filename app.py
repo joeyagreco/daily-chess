@@ -14,6 +14,8 @@ from service.evaluate_game import get_worst_move_for_user
 from util.discord import send_discord_message
 from util.EnvironmentReader import EnvironmentReader
 
+TEST = bool(EnvironmentReader.get("TEST"))
+RUN_AT_TIME = EnvironmentReader.get("RUN_AT_TIME")
 USERNAME = EnvironmentReader.get("LICHESS_USERNAME")
 NUM_GAMES = int(EnvironmentReader.get("NUM_GAMES"))
 PERF_TYPE = PerfType.from_str(EnvironmentReader.get("PERF_TYPE"))
@@ -247,11 +249,10 @@ def main() -> None:
 
 
 if __name__ == "__main__":
-    TEST = bool(EnvironmentReader.get("TEST"))
     if TEST:
         main()
     else:
-        schedule.every().day.at(EnvironmentReader.get("RUN_AT_TIME")).do(main)
+        schedule.every().day.at(RUN_AT_TIME).do(main)
 
         while True:
             try:
