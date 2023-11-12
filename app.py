@@ -79,9 +79,6 @@ def main() -> None:
                 lowest_elo_lost = winner_elo
                 lowest_elo_lost_username = game.winning_player.user.name
 
-        # openings_and_game[game.opening.name].append(
-        #     {"url": game.game_url, "outcome": game_outcome.value, "status": game.status.value}
-        # )
         openings_and_game[game.opening.name].append(game)
         # sort
         # primary sort on: win -> loss -> tie
