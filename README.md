@@ -50,6 +50,7 @@ These can be set in an `.env` file in the root of the project or any other way y
 | DISCORD_WEBHOOK_URL            	| Yes     	| str      	| The URL of the Discord webhook to call. [GUIDE](https://hookdeck.com/webhooks/platforms/how-to-get-started-with-discord-webhooks#discord-webhook-example)                                                            	|
 | DISCORD_DAILY_OPENINGS_TO_SEND 	| Yes     	| integer  	| The number of openings to send each day (e.g. 3 would mean 3 openings are sent each day in the analysis) 	|
 | EVALUATION_DEPTH 	| Yes     	| integer  	| The depth the chess engine should go to when evaluating a game 	|
+| MAX_LOSSES_TO_EVALUATE 	| Yes     	| integer  	| The maximum number of losses to evaluate 	|
 | TEST                           	| No    	| boolean  	| Whether to run this in test mode or not.                                                                 	|
 
 ## Contributing

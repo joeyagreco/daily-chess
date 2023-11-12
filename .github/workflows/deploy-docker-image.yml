@@ -31,6 +31,7 @@ jobs:
           echo "DISCORD_WEBHOOK_URL=${{ secrets.DISCORD_WEBHOOK_URL }}" >> .env
           echo "DISCORD_DAILY_OPENINGS_TO_SEND=${{ secrets.DISCORD_DAILY_OPENINGS_TO_SEND }}" >> .env
           echo "EVALUATION_DEPTH=${{ secrets.EVALUATION_DEPTH }}" >> .env
+          echo "MAX_LOSSES_TO_EVALUATE=${{ secrets.MAX_LOSSES_TO_EVALUATE }}" >> .env
 
         shell: bash
 

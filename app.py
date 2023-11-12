@@ -22,6 +22,7 @@ PERF_TYPE = PerfType.from_str(EnvironmentReader.get("PERF_TYPE"))
 WEBHOOK_URL = EnvironmentReader.get("DISCORD_WEBHOOK_URL")
 DISCORD_DAILY_OPENINGS_TO_SEND = int(EnvironmentReader.get("DISCORD_DAILY_OPENINGS_TO_SEND"))
 EVALUATION_DEPTH = int(EnvironmentReader.get("EVALUATION_DEPTH"))
+MAX_LOSSES_TO_EVALUATE = int(EnvironmentReader.get("MAX_LOSSES_TO_EVALUATE"))
 STOCKFISH_EXECUTABLE_NAME = "stockfish.exe" if TEST else "stockfish"
 
 
@@ -104,14 +105,10 @@ def main() -> None:
     # store all openings and the frequency
     opening_and_frequency_embeds = []
 
+    # store info about worst and best openings
     opening_detail_fields = []
 
     for i, (opening_name, elo) in enumerate(sorted_openings):
-        # only evaluate with engine the first n and last n openings (worst and best)
-        evaluate_with_engine = (
-            i < DISCORD_DAILY_OPENINGS_TO_SEND
-            or i >= len(sorted_openings) - DISCORD_DAILY_OPENINGS_TO_SEND
-        )
         outcome_counts = {
             outcome: sum(
                 1
@@ -134,26 +131,30 @@ def main() -> None:
                 "inline": False,
             }
         )
+        opening_detail_fields.append({"name": opening_name, "value": value, "inline": False})
 
-        for j, game in enumerate(openings_and_game[opening_name]):
-            outcome_for_user = game.outcome_for_user(USERNAME)
-            eval_str = ""
-            # get worst move
-            if evaluate_with_engine:
-                print(
-                    f"EVALUATING GAME {j+1}/{len(openings_and_game[opening_name])} FOR OPENING {opening_name}"
-                )
-                worst_move = get_worst_move_for_user(
-                    chess_game=game,
-                    username=USERNAME,
-                    evaluation_depth=EVALUATION_DEPTH,
-                    stockfish_executable_name=STOCKFISH_EXECUTABLE_NAME,
-                )
-                # eval_str = f"[ :x: {worst_move.actual_move} -> :white_check_mark: {worst_move.engine_best_move}]({worst_move.url})"
-            value += (
-                f"[{outcome_for_user.value} ({game.status.value})]({game.game_url}){eval_str}\n"
-            )
-        opening_detail_fields.append({"name": opening_name, "value": value, "inline": True})
+    game_eval_embeds = []
+
+    # get eval for each loss
+    evaluate_games = [g for g in games if g.outcome_for_user(USERNAME) == ChessGameOutcome.LOSS][
+        :MAX_LOSSES_TO_EVALUATE
+    ]
+    for i, game in enumerate(evaluate_games):
+        print(f"EVALUATING GAME {i+1}/{len(evaluate_games)}")
+        worst_move = get_worst_move_for_user(
+            chess_game=game,
+            username=USERNAME,
+            evaluation_depth=EVALUATION_DEPTH,
+            stockfish_executable_name=STOCKFISH_EXECUTABLE_NAME,
+        )
+        eval_str = f"[ :x: {worst_move.actual_move} -> :white_check_mark: {worst_move.engine_best_move}]({worst_move.url})"
+        game_eval_embeds.append(
+            {
+                "description": f"[{ChessGameOutcome.LOSS.value} ({game.status.value})]({game.game_url}){eval_str}\n",
+                "color": HexColor.ORANGE.value,
+                "footer": {"text": f"{i+1}/{len(evaluate_games)}"},
+            }
+        )
 
     # sort from most -> least frequent openings
     opening_and_frequency_embeds = sorted(
@@ -255,8 +256,9 @@ def main() -> None:
         worst_openings_embed,
         best_openings_embed,
         most_played_openings_embed,
-    ]:
+    ] + game_eval_embeds:
         send_discord_message(webhook_url=WEBHOOK_URL, embeds=[embed])
+        time.sleep(1)
 
 
 if __name__ == "__main__":
