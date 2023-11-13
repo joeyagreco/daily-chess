@@ -25,6 +25,7 @@ DISCORD_DAILY_OPENINGS_TO_SEND = int(EnvironmentReader.get("DISCORD_DAILY_OPENIN
 EVALUATION_DEPTH = int(EnvironmentReader.get("EVALUATION_DEPTH"))
 MAX_LOSSES_TO_EVALUATE = int(EnvironmentReader.get("MAX_LOSSES_TO_EVALUATE"))
 STOCKFISH_EXECUTABLE_NAME = "stockfish.exe" if TEST else "stockfish"
+SPOILER_DELIMETER = "||"
 
 
 def main() -> None:
@@ -153,7 +154,7 @@ def main() -> None:
             {"name": "Actual Move", "value": f":x: {worst_move.actual_move}", "inline": False},
             {
                 "name": "Best Move",
-                "value": f":white_check_mark: {worst_move.engine_best_move}",
+                "value": f":white_check_mark: {SPOILER_DELIMETER}{worst_move.engine_best_move}{SPOILER_DELIMETER}",
                 "inline": False,
             },
         ]
