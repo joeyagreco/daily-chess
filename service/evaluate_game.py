@@ -9,7 +9,12 @@ from model.MoveEval import MoveEval
 
 
 def get_worst_move_for_user(
-    *, chess_game: ChessGameV2, username: str, evaluation_depth: int, stockfish_executable_name: str
+    *,
+    chess_game: ChessGameV2,
+    username: str,
+    evaluation_depth: int,
+    stockfish_executable_name: str,
+    stop_after_eval_change_of: int,
 ) -> MoveEval:
     """
     Returns the worst move from the given game for the user with the given username.
@@ -28,7 +33,6 @@ def get_worst_move_for_user(
     MATE_VALUE = -10_000
     board = chess.Board()
     stockfish.set_depth(evaluation_depth)
-    stop_after_eval_change_of = -300
 
     move_evals: list[MoveEval] = []
 

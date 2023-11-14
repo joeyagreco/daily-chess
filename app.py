@@ -24,6 +24,7 @@ WEBHOOK_URL = EnvironmentReader.get("DISCORD_WEBHOOK_URL")
 DISCORD_DAILY_OPENINGS_TO_SEND = int(EnvironmentReader.get("DISCORD_DAILY_OPENINGS_TO_SEND"))
 EVALUATION_DEPTH = int(EnvironmentReader.get("EVALUATION_DEPTH"))
 MAX_LOSSES_TO_EVALUATE = int(EnvironmentReader.get("MAX_LOSSES_TO_EVALUATE"))
+STOP_AFTER_EVAL_CHANGE_OF = int(EnvironmentReader.get("STOP_AFTER_EVAL_CHANGE_OF"))
 STOCKFISH_EXECUTABLE_NAME = "stockfish.exe" if TEST else "stockfish"
 SPOILER_DELIMETER = "||"
 
@@ -148,6 +149,7 @@ def main() -> None:
             username=USERNAME,
             evaluation_depth=EVALUATION_DEPTH,
             stockfish_executable_name=STOCKFISH_EXECUTABLE_NAME,
+            stop_after_eval_change_of=STOP_AFTER_EVAL_CHANGE_OF,
         )
         user_color = game.color_for_user(USERNAME)
         fields = [

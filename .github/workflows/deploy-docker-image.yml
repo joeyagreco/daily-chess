@@ -32,6 +32,7 @@ jobs:
           echo "DISCORD_DAILY_OPENINGS_TO_SEND=${{ secrets.DISCORD_DAILY_OPENINGS_TO_SEND }}" >> .env
           echo "EVALUATION_DEPTH=${{ secrets.EVALUATION_DEPTH }}" >> .env
           echo "MAX_LOSSES_TO_EVALUATE=${{ secrets.MAX_LOSSES_TO_EVALUATE }}" >> .env
+          echo "STOP_AFTER_EVAL_CHANGE_OF=${{ secrets.STOP_AFTER_EVAL_CHANGE_OF }}" >> .env
 
         shell: bash
 
