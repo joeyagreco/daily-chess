@@ -15,7 +15,7 @@ from service.evaluate_game import get_worst_move_for_user
 from util.discord import send_discord_message
 from util.EnvironmentReader import EnvironmentReader
 
-TEST = EnvironmentReader.get("TEST", "false").lower() == True
+TEST = bool(EnvironmentReader.get("TEST", "false").lower()) == True
 RUN_AT_TIME = EnvironmentReader.get("RUN_AT_TIME")
 USERNAME = EnvironmentReader.get("LICHESS_USERNAME")
 NUM_GAMES = int(EnvironmentReader.get("NUM_GAMES"))
