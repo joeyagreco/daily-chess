@@ -28,7 +28,9 @@ def get_worst_move_for_user(
     stockfish_absolute_path = os.path.abspath(
         os.path.join(os.path.dirname(__file__), stockfish_relative_path)
     )
+    print(f"ATTEMPTING TO LOAD STOCKFISH FROM: '{stockfish_absolute_path}'")
     stockfish = Stockfish(stockfish_absolute_path)
+    print(f"SUCCESSFULLY LOADED STOCKFISH")
 
     MATE_VALUE = -10_000
     board = chess.Board()

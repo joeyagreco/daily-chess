@@ -43,6 +43,8 @@ def main() -> None:
         last_fen=True,
     )
 
+    print(f"SUCCESSFULLY RETRIEVED {len(games)} GAMES...")
+
     # calculate net elo for each opening
     openings_and_net_elo = defaultdict(float)
 
@@ -264,6 +266,8 @@ def main() -> None:
         "fields": elo_recap_fields,
         "color": HexColor.BLUE.value,
     }
+
+    print(f"SENDING EMBEDS TO DISCORD...")
     # send to discord
     for embed in [
         title_embed,
@@ -279,8 +283,10 @@ def main() -> None:
 
 if __name__ == "__main__":
     if TEST:
+        print("RUNNING AS TEST...")
         main()
     else:
+        print(f"SCHEDULED TO RUN AT {RUN_AT_TIME} DAILY...")
         schedule.every().day.at(RUN_AT_TIME).do(main)
 
         while True:
