@@ -290,6 +290,9 @@ if __name__ == "__main__":
         schedule.every().day.at(RUN_AT_TIME).do(main)
 
         while True:
+            # TODO: fix this
+            main()
+            exit()
             try:
                 schedule.run_pending()
                 time.sleep(1)
