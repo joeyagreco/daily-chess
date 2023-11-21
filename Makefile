@@ -1,12 +1,17 @@
 .PHONY: deps
 deps: deps
 	@python3 -m pip install -r requirements.format.txt
+	@python3 -m pip install -r requirements.txt
 
 .PHONY: fmt
 fmt:
 	@black --config=pyproject.toml .
 	@autoflake --config=pyproject.toml .
 	@isort .
+
+.PHONY: up
+up:
+	@python3 app.py
 
 .PHONY: up-reqs
 up-reqs:

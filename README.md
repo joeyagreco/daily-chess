@@ -18,11 +18,11 @@ Daily Chess Reviews.
 3. Install dependencies
 
     ```bash
-    python -m pip install -r requirements.txt
+    make deps
     ```
 4. Run the script
     ```bash
-    python app.py
+    make up
     ``````
 
 ## Run with Docker
@@ -30,11 +30,11 @@ Daily Chess Reviews.
 1. Ensure your [environment variables](https://github.com/joeyagreco/daily-chess#environment-variables) are correctly set
 2. Build Docker
     ```bash
-    ./main build-docker
+    make build-docker
     ```
 3. Run Docker
     ```bash
-    ./main docker
+    make docker
     ```
 
 ## Environment Variables
