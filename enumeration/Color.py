@@ -8,6 +8,7 @@ from enumeration.BaseEnum import BaseEnum
 @unique
 class Color(BaseEnum):
     BLUE = "BLUE"
+    GREEN = "GREEN"
     RED = "RED"
 
     @staticmethod

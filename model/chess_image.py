@@ -29,7 +29,6 @@ class ChessBoardImage:
     arrows: list[ChessBoardArrow]
 
     def save_image(self, output_file: str):
-
         pygame.init()
 
         def load_piece_images():
@@ -61,8 +60,10 @@ class ChessBoardImage:
 
         piece_images = load_piece_images()
         board = parse_fen(self.fen)
+
+        # Adjusting for perspective
         if self.perspective == ChessColor.BLACK:
-            board = board[::-1]
+            board = [row[::-1] for row in board[::-1]]
 
         board_size = 8
         colors = [pygame.Color("white"), pygame.Color("gray")]
@@ -101,6 +102,8 @@ class ChessBoardImage:
         # Drawing labels
         letters = "ABCDEFGH"
         numbers = "87654321"
+
+        # Adjust for perspective
         if self.perspective == ChessColor.BLACK:
             letters = letters[::-1]
             numbers = numbers[::-1]
@@ -108,7 +111,7 @@ class ChessBoardImage:
         label_offset = 2  # Small offset for better positioning
 
         for i in range(board_size):
-            # Draw letters at the bottom left of the bottom row
+            # Draw letters
             letter_surface = font.render(letters[i], True, pygame.Color("black"))
             letter_x = i * TILE_SIZE + label_offset
             letter_y = (
@@ -119,7 +122,7 @@ class ChessBoardImage:
             )
             surface.blit(letter_surface, (letter_x, letter_y))
 
-            # Draw numbers at the top right of the rightmost row
+            # Draw numbers
             number_surface = font.render(numbers[i], True, pygame.Color("black"))
             number_x = (
                 (board_size - 1) * TILE_SIZE + TILE_SIZE - number_surface.get_width() - label_offset
@@ -127,7 +130,7 @@ class ChessBoardImage:
             number_y = i * TILE_SIZE + label_offset
             surface.blit(number_surface, (number_x, number_y))
 
-        # Drawing arrows
+        # draw arrows
         for arrow in self.arrows:
             self.draw_arrow(arrow=arrow, surface=surface)
 
@@ -135,7 +138,6 @@ class ChessBoardImage:
         pygame.quit()
 
     def draw_arrow(self, *, arrow: ChessBoardArrow, surface: pygame.Surface):
-        print(f"drawing arrow from {arrow.start_coordinate} -> {arrow.end_coordinate}")
 
         # Convert opacity from percentage to 0-255 range
         alpha = int(ARROW_OPACITY * 255 / 100)
@@ -152,9 +154,9 @@ class ChessBoardImage:
         arrowhead_angle = math.pi / 6
 
         # calculations
-        start_x = (ord(arrow.start_coordinate[0]) - ord('a')) * TILE_SIZE + TILE_SIZE // 2
+        start_x = (ord(arrow.start_coordinate[0]) - ord("a")) * TILE_SIZE + TILE_SIZE // 2
         start_y = (8 - int(arrow.start_coordinate[1])) * TILE_SIZE + TILE_SIZE // 2
-        end_x = (ord(arrow.end_coordinate[0]) - ord('a')) * TILE_SIZE + TILE_SIZE // 2
+        end_x = (ord(arrow.end_coordinate[0]) - ord("a")) * TILE_SIZE + TILE_SIZE // 2
         end_y = (8 - int(arrow.end_coordinate[1])) * TILE_SIZE + TILE_SIZE // 2
 
         # Check if the perspective is black and adjust coordinates if necessary
@@ -187,8 +189,3 @@ class ChessBoardImage:
 
         # Blit the arrow surface onto the main surface
         surface.blit(arrow_surface, (0, 0))
-
-
-
-
-

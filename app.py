@@ -6,9 +6,11 @@ import schedule
 from enumeration.ChessColor import ChessColor
 from enumeration.ChessGameOutcome import ChessGameOutcome
 from enumeration.ChessStatus import ChessStatus
+from enumeration.Color import Color
 from enumeration.HexColor import HexColor
 from enumeration.PerfType import PerfType
 from enumeration.Sort import Sort
+from model.chess_image import ChessBoardArrow, ChessBoardImage
 from model.ChessGameV2 import ChessGameV2
 from service.chess_game import get_games_for_user_v2
 from service.evaluate_game import get_worst_move_for_user
@@ -144,6 +146,8 @@ def main() -> None:
     evaluate_games = [g for g in games if g.outcome_for_user(USERNAME) == ChessGameOutcome.LOSS][
         :MAX_LOSSES_TO_EVALUATE
     ]
+
+    chess_board_images: list[ChessBoardImage] = []
     for i, game in enumerate(evaluate_games):
         print(f"EVALUATING GAME {i+1}/{len(evaluate_games)}")
         worst_move = get_worst_move_for_user(
@@ -154,24 +158,43 @@ def main() -> None:
             stop_after_eval_change_of=STOP_AFTER_EVAL_CHANGE_OF,
         )
         user_color = game.color_for_user(USERNAME)
-        fields = [
-            {"name": "Actual Move", "value": f":x: {worst_move.actual_move}", "inline": False},
-            {
-                "name": "Best Move",
-                "value": f":white_check_mark: {SPOILER_DELIMETER}{worst_move.engine_best_move}{SPOILER_DELIMETER}",
-                "inline": False,
-            },
-        ]
+        # fields = [
+        #     {"name": "Actual Move", "value": f":x: {worst_move.actual_move}", "inline": False},
+        #     {
+        #         "name": "Best Move",
+        #         "value": f":white_check_mark: {SPOILER_DELIMETER}{worst_move.engine_best_move}{SPOILER_DELIMETER}",
+        #         "inline": False,
+        #     },
+        # ]
         game_eval_embeds.append(
             {
                 "title": f"{ChessGameOutcome.LOSS.value} ({game.status.value}) as {user_color.value}",
                 "description": f"[POSITION]({worst_move.url})\n\n[GAME]({game.game_url})",
-                "fields": fields,
+                # "fields": fields,
                 "color": HexColor.WHITE.value
                 if user_color == ChessColor.WHITE
                 else HexColor.BLACK.value,
                 "footer": {"text": f"{i+1}/{len(evaluate_games)}"},
             }
+        )
+        worst_move_start_coordinate = worst_move.actual_move[:2]
+        worst_move_end_coordinate = worst_move.actual_move[2:]
+        best_move_start_coordinate = worst_move.engine_best_move[:2]
+        best_move_end_coordinate = worst_move.engine_best_move[2:]
+        arrows = [
+            ChessBoardArrow(
+                start_coordinate=worst_move_start_coordinate,
+                end_coordinate=worst_move_end_coordinate,
+                color=Color.RED,
+            ),
+            ChessBoardArrow(
+                start_coordinate=best_move_start_coordinate,
+                end_coordinate=best_move_end_coordinate,
+                color=Color.GREEN,
+            ),
+        ]
+        chess_board_images.append(
+            ChessBoardImage(fen=worst_move.fen_before_move, perspective=user_color, arrows=arrows)
         )
 
     # sort from most -> least frequent openings
@@ -268,7 +291,7 @@ def main() -> None:
     }
 
     print(f"SENDING EMBEDS TO DISCORD...")
-    # send to discord
+    # send embeds without images to discord
     for embed in [
         title_embed,
         terminations_embed,
@@ -276,8 +299,17 @@ def main() -> None:
         worst_openings_embed,
         best_openings_embed,
         most_played_openings_embed,
-    ] + game_eval_embeds:
+    ]:
         send_discord_message(webhook_url=WEBHOOK_URL, embeds=[embed])
+        time.sleep(1)
+
+    # send embeds with images to discord
+    for chess_image, game_eval_embed in zip(chess_board_images, game_eval_embeds):
+        image_path = f"tmp/image_{i}.png"
+        chess_image.save_image(image_path)
+        send_discord_message(
+            webhook_url=WEBHOOK_URL, embeds=[game_eval_embed], file_path=image_path
+        )
         time.sleep(1)
 
 

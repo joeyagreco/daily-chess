@@ -1,3 +1,6 @@
+import json
+from typing import Optional
+
 import requests
 
 from api.BaseApiClient import BaseApiClient
@@ -7,10 +10,25 @@ class DiscordApiClient(BaseApiClient):
     def __init__(self):
         super().__init__()
 
-    @classmethod
-    def send_webhook(cls, *, url: str, embeds: list[dict]) -> None:
+    def send_webhook(cls, *, url: str, embeds: list[dict], file_path: Optional[str] = None) -> None:
         """
-        https://birdie0.github.io/discord-webhooks-guide/structure/embeds.html
+        Send a webhook to Discord with optional file attachment.
+
+        Args:
+        - url (str): The webhook URL.
+        - embeds (list[dict]): The embeds to send.
+        - file_path (Optional[str]): The path to the file to attach (default is None).
         """
-        data = {"embeds": embeds}
-        cls._rest_call(requests.post, url, json=data)
+        if file_path:
+            with open(file_path, "rb") as file:
+                # add the image as an embed
+                embeds.append({"image": {"url": f"attachment://{file_path}"}})
+
+                payload = {
+                    "payload_json": (None, json.dumps({"embeds": embeds})),
+                    "file": (file_path.split("/")[-1], file),
+                }
+                cls._rest_call(requests.post, url, files=payload)
+        else:
+            data = {"embeds": embeds}
+            cls._rest_call(requests.post, url, json=data)
