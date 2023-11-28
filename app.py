@@ -1,3 +1,5 @@
+import os
+import tempfile
 import time
 from collections import defaultdict
 
@@ -305,12 +307,13 @@ def main() -> None:
 
     # send embeds with images to discord
     for chess_image, game_eval_embed in zip(chess_board_images, game_eval_embeds):
-        image_path = f"tmp/image_{i}.png"
-        chess_image.save_image(image_path)
-        send_discord_message(
-            webhook_url=WEBHOOK_URL, embeds=[game_eval_embed], file_path=image_path
-        )
-        time.sleep(1)
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            image_path = os.path.join(tmp_dir, f"image_{i+1}.png")
+            chess_image.save_image(image_path)
+            send_discord_message(
+                webhook_url=WEBHOOK_URL, embeds=[game_eval_embed], file_path=image_path
+            )
+            time.sleep(1)
 
 
 if __name__ == "__main__":
