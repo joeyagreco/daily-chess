@@ -25,7 +25,7 @@ DISCORD_DAILY_OPENINGS_TO_SEND = int(EnvironmentReader.get("DISCORD_DAILY_OPENIN
 EVALUATION_DEPTH = int(EnvironmentReader.get("EVALUATION_DEPTH"))
 MAX_LOSSES_TO_EVALUATE = int(EnvironmentReader.get("MAX_LOSSES_TO_EVALUATE"))
 STOP_AFTER_EVAL_CHANGE_OF = int(EnvironmentReader.get("STOP_AFTER_EVAL_CHANGE_OF"))
-STOCKFISH_EXECUTABLE_NAME = "stockfish.exe" if TEST else "stockfish"
+STOCKFISH_EXECUTABLE_NAME = "stockfish_macos" if TEST else "stockfish"
 SPOILER_DELIMETER = "||"
 
 

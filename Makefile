@@ -1,7 +1,7 @@
 .PHONY: deps
 deps: deps
-	@python3 -m pip install -r requirements.format.txt
-	@python3 -m pip install -r requirements.txt
+	@python3.12 -m pip install -r requirements.format.txt
+	@python3.12 -m pip install -r requirements.txt
 
 .PHONY: fmt
 fmt:
@@ -11,11 +11,11 @@ fmt:
 
 .PHONY: up
 up:
-	@python3 app.py
+	@python3.12 app.py
 
 .PHONY: up-reqs
 up-reqs:
-	@pipreqs . --force
+	@pipreqs --force --mode compat
 
 .PHONY: docker-build
 docker-build:
