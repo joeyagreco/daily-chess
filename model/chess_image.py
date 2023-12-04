@@ -12,7 +12,8 @@ from enumeration.Color import Color
 # image constants
 TILE_SIZE = 60
 ARROW_OPACITY = 60
-ARROW_THICKNESS = 10
+ARROW_LINE_THICKNESS = 10
+ARROWHEAD_LENGTH = 28
 
 
 @dataclass(kw_only=True)
@@ -138,7 +139,6 @@ class ChessBoardImage:
         pygame.quit()
 
     def draw_arrow(self, *, arrow: ChessBoardArrow, surface: pygame.Surface):
-
         # Convert opacity from percentage to 0-255 range
         alpha = int(ARROW_OPACITY * 255 / 100)
 
@@ -149,39 +149,44 @@ class ChessBoardImage:
         # Create a separate surface for the arrow with per-pixel alpha
         arrow_surface = pygame.Surface(surface.get_size(), pygame.SRCALPHA)
 
-        # Calculate arrowhead properties
-        arrowhead_length = 20
-        arrowhead_angle = math.pi / 6
+        # Arrowhead properties
+        arrowhead_angle = math.pi / 5
 
-        # calculations
+        # Calculations for start and end points
         start_x = (ord(arrow.start_coordinate[0]) - ord("a")) * TILE_SIZE + TILE_SIZE // 2
         start_y = (8 - int(arrow.start_coordinate[1])) * TILE_SIZE + TILE_SIZE // 2
         end_x = (ord(arrow.end_coordinate[0]) - ord("a")) * TILE_SIZE + TILE_SIZE // 2
         end_y = (8 - int(arrow.end_coordinate[1])) * TILE_SIZE + TILE_SIZE // 2
 
-        # Check if the perspective is black and adjust coordinates if necessary
+        # Adjust for black perspective
         if self.perspective == ChessColor.BLACK:
             start_x = surface.get_width() - start_x
             start_y = surface.get_height() - start_y
             end_x = surface.get_width() - end_x
             end_y = surface.get_height() - end_y
 
-        # Draw the line on the arrow surface
-        pygame.draw.line(arrow_surface, color, (start_x, start_y), (end_x, end_y), ARROW_THICKNESS)
-
-        # Calculate the angle of the line
+        # Calculate the angle and adjust end point for arrowhead
         dx = end_x - start_x
         dy = end_y - start_y
         angle = math.atan2(dy, dx)
 
+        # Adjust the end point of the line so it doesn't extend into the arrowhead
+        line_end_x = end_x - ARROWHEAD_LENGTH * math.cos(angle)
+        line_end_y = end_y - ARROWHEAD_LENGTH * math.sin(angle)
+
+        # Draw the line on the arrow surface
+        pygame.draw.line(
+            arrow_surface, color, (start_x, start_y), (line_end_x, line_end_y), ARROW_LINE_THICKNESS
+        )
+
         # Calculate arrowhead points at the end
         right_end = (
-            end_x - arrowhead_length * math.cos(angle - arrowhead_angle),
-            end_y - arrowhead_length * math.sin(angle - arrowhead_angle),
+            end_x - ARROWHEAD_LENGTH * math.cos(angle - arrowhead_angle),
+            end_y - ARROWHEAD_LENGTH * math.sin(angle - arrowhead_angle),
         )
         left_end = (
-            end_x - arrowhead_length * math.cos(angle + arrowhead_angle),
-            end_y - arrowhead_length * math.sin(angle + arrowhead_angle),
+            end_x - ARROWHEAD_LENGTH * math.cos(angle + arrowhead_angle),
+            end_y - ARROWHEAD_LENGTH * math.sin(angle + arrowhead_angle),
         )
 
         # Draw the arrowhead on the arrow surface
