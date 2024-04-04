@@ -21,8 +21,8 @@ class DiscordApiClient(BaseApiClient):
         """
         if file_path:
             with open(file_path, "rb") as file:
-                # add the image as an embed
-                embeds.append({"image": {"url": f"attachment://{file_path}"}})
+                # Set the image in the last embed's image url field
+                embeds[-1]["image"] = {"url": f"attachment://{file_path.split('/')[-1]}"}
 
                 payload = {
                     "payload_json": (None, json.dumps({"embeds": embeds})),

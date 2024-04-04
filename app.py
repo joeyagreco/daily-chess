@@ -160,19 +160,10 @@ def main() -> None:
             stop_after_eval_change_of=STOP_AFTER_EVAL_CHANGE_OF,
         )
         user_color = game.color_for_user(USERNAME)
-        # fields = [
-        #     {"name": "Actual Move", "value": f":x: {worst_move.actual_move}", "inline": False},
-        #     {
-        #         "name": "Best Move",
-        #         "value": f":white_check_mark: {SPOILER_DELIMETER}{worst_move.engine_best_move}{SPOILER_DELIMETER}",
-        #         "inline": False,
-        #     },
-        # ]
         game_eval_embeds.append(
             {
                 "title": f"{ChessGameOutcome.LOSS.value} ({game.status.value}) as {user_color.value}",
                 "description": f"[POSITION]({worst_move.url})\n\n[GAME]({game.game_url})",
-                # "fields": fields,
                 "color": HexColor.WHITE.value
                 if user_color == ChessColor.WHITE
                 else HexColor.BLACK.value,
