@@ -12,6 +12,7 @@ from enumeration.Color import Color
 from enumeration.HexColor import HexColor
 from enumeration.PerfType import PerfType
 from enumeration.Sort import Sort
+from model.ChessOpening import ChessOpening
 from model.chess_image import ChessBoardArrow, ChessBoardImage
 from model.ChessGameV2 import ChessGameV2
 from service.chess_game import get_games_for_user_v2
@@ -131,7 +132,7 @@ def main() -> None:
         pre_modifier = "+" if elo > 0 else ""
         emoji = ":chart_with_upwards_trend:" if elo > 0 else ":chart_with_downwards_trend:"
         emoji = ":heavy_minus_sign:" if elo == 0 else emoji
-        value = f"\nELO: {pre_modifier}{elo} {emoji}\nGAMES PLAYED: {len(openings_and_game[opening_name])}\nRECORD: {record_str}\n\n"
+        value = f"\nELO: {pre_modifier}{elo} {emoji}\nGAMES PLAYED: {len(openings_and_game[opening_name])}\nRECORD: {record_str}\n[Opening Explorer]({ChessOpening.get_lichess_url(opening_name)})"
 
         opening_and_frequency_embeds.append(
             {
