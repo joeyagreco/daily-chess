@@ -208,7 +208,7 @@ def main() -> None:
         ):
             status_embed_fields.append(
                 {
-                    "name": status,
+                    "name": status.replace("_", " ").title(),
                     "value": f"{outcomes[ChessGameOutcome.WIN.value]}-{outcomes[ChessGameOutcome.LOSS.value]}-{outcomes[ChessGameOutcome.TIE.value]}",
                     "inline": False,
                 }
