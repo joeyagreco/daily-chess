@@ -1,7 +1,6 @@
 import os
 import tempfile
 import time
-from collections import defaultdict
 
 import schedule
 
@@ -12,11 +11,12 @@ from enumeration.Color import Color
 from enumeration.HexColor import HexColor
 from enumeration.PerfType import PerfType
 from enumeration.Sort import Sort
-from model.ChessOpening import ChessOpening
 from model.chess_image import ChessBoardArrow, ChessBoardImage
 from model.ChessGameV2 import ChessGameV2
+from model.ChessOpening import ChessOpening
 from service.chess_game import get_games_for_user_v2
 from service.evaluate_game import get_worst_move_for_user
+from service.user_eval import get_elo_string, get_emoji_for_color, get_emoji_for_elo, get_opening_infos, get_record_string
 from util.discord import send_discord_message
 from util.EnvironmentReader import EnvironmentReader
 
@@ -51,7 +51,7 @@ def main() -> None:
     print(f"SUCCESSFULLY RETRIEVED {len(games)} GAMES...")
 
     # calculate net elo for each opening
-    openings_and_net_elo = defaultdict(float)
+    # openings_and_net_elo = defaultdict(float)
 
     # calculate best and worst user/elo beat and lost to
     highest_elo_beat = None
@@ -71,7 +71,6 @@ def main() -> None:
     for game in games:
         if game.opening.name not in openings_and_game.keys():
             openings_and_game[game.opening.name] = []
-        openings_and_net_elo[game.opening.name] += game.get_chess_player(USERNAME).rating_diff
 
         # get game outcome (status)
         game_outcome = game.outcome_for_user(USERNAME)
@@ -107,10 +106,6 @@ def main() -> None:
                 game.status.value,
             )
         )
-    openings_and_net_elo = dict(openings_and_net_elo)
-
-    # Convert dict to sorted list of tuples
-    sorted_openings = sorted(openings_and_net_elo.items(), key=lambda x: x[1], reverse=False)
 
     # store all openings and the frequency
     opening_and_frequency_embeds = []
@@ -118,30 +113,23 @@ def main() -> None:
     # store info about worst and best openings
     opening_detail_fields = []
 
-    for i, (opening_name, elo) in enumerate(sorted_openings):
-        outcome_counts = {
-            outcome: sum(
-                1
-                for game in openings_and_game[opening_name]
-                if game.outcome_for_user(USERNAME) == outcome
-            )
-            for outcome in [ChessGameOutcome.WIN, ChessGameOutcome.LOSS, ChessGameOutcome.TIE]
-        }
-
-        record_str = f"{outcome_counts[ChessGameOutcome.WIN]}-{outcome_counts[ChessGameOutcome.LOSS]}-{outcome_counts[ChessGameOutcome.TIE]}"
-        pre_modifier = "+" if elo > 0 else ""
-        emoji = ":chart_with_upwards_trend:" if elo > 0 else ":chart_with_downwards_trend:"
-        emoji = ":heavy_minus_sign:" if elo == 0 else emoji
-        value = f"\nELO: {pre_modifier}{elo} {emoji}\nGAMES PLAYED: {len(openings_and_game[opening_name])}\nRECORD: {record_str}\n[Opening Explorer]({ChessOpening.get_lichess_url(opening_name)})"
-
+    opening_infos = get_opening_infos(games=games, for_username=USERNAME)
+    # sort from worst elo -> best elo
+    opening_infos.sort(key=lambda opening: opening.net_elo)
+    for opening_info in opening_infos:
+        record_str = get_record_string(opening_info.player_outcomes)
+        elo_string = get_elo_string(opening_info.net_elo)
+        emoji = get_emoji_for_elo(opening_info.net_elo)
+        times_played = len(opening_info.player_outcomes)
+        value = f"\nCOLOR: {get_emoji_for_color(opening_info.player_color)}\nELO: {elo_string} {emoji}\nGAMES PLAYED: {times_played}\nRECORD: {record_str}\n[Opening Explorer]({ChessOpening.get_lichess_url(opening_info.opening_name)})"
         opening_and_frequency_embeds.append(
             {
-                "name": opening_name,
-                "value": str(len(openings_and_game[opening_name])),
+                "name": opening_info.opening_name,
+                "value": str(times_played),
                 "inline": False,
             }
         )
-        opening_detail_fields.append({"name": opening_name, "value": value, "inline": False})
+        opening_detail_fields.append({"name": opening_info.opening_name, "value": value, "inline": False})
 
     game_eval_embeds = []
 

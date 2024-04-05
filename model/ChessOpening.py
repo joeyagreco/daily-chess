@@ -14,7 +14,7 @@ class ChessOpening(DictDeserializable):
     @staticmethod
     def from_dict(d: dict) -> ChessOpening:
         return ChessOpening(eco=d["eco"], name=d["name"], ply=d["ply"])
-    
+
     @staticmethod
     def get_lichess_url(opening_name: str) -> str:
         normalized_opening_name = opening_name
