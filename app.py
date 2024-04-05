@@ -121,15 +121,18 @@ def main() -> None:
         elo_string = get_elo_string(opening_info.net_elo)
         emoji = get_emoji_for_elo(opening_info.net_elo)
         times_played = len(opening_info.player_outcomes)
-        value = f"\nCOLOR: {get_emoji_for_color(opening_info.player_color)}\nELO: {elo_string} {emoji}\nGAMES PLAYED: {times_played}\nRECORD: {record_str}\n[Opening Explorer]({ChessOpening.get_lichess_url(opening_info.opening_name)})"
+        value = f"\nELO: {elo_string} {emoji}\nGAMES PLAYED: {times_played}\nRECORD: {record_str}\n[Opening Explorer]({ChessOpening.get_lichess_url(opening_info.opening_name)})"
+        opening_display_name = f"{opening_info.opening_name} {get_emoji_for_color(opening_info.player_color)}"
+        
         opening_and_frequency_embeds.append(
             {
-                "name": opening_info.opening_name,
+                "name": opening_display_name,
                 "value": str(times_played),
                 "inline": False,
             }
         )
-        opening_detail_fields.append({"name": opening_info.opening_name, "value": value, "inline": False})
+        
+        opening_detail_fields.append({"name": opening_display_name, "value": value, "inline": False})
 
     game_eval_embeds = []
 
@@ -228,12 +231,12 @@ def main() -> None:
         "fields": [
             {
                 "name": "Best Win",
-                "value": f"{highest_elo_beat_username}: {highest_elo_beat}",
+                "value": f"**{highest_elo_beat_username}**: {highest_elo_beat}",
                 "inline": True,
             },
             {
                 "name": "Worst Loss",
-                "value": f"{lowest_elo_lost_username}: {lowest_elo_lost}",
+                "value": f"**{lowest_elo_lost_username}**: {lowest_elo_lost}",
                 "inline": True,
             },
         ],
