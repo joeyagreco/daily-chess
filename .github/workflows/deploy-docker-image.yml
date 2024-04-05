@@ -42,7 +42,6 @@ jobs:
         with:
           images: ${{ secrets.DOCKERHUB_USERNAME }}/daily-chess
           tags: |
-            type=sha
             type=semver,pattern={{version}}
             type=ref,event=branch
             type=ref,event=tag
