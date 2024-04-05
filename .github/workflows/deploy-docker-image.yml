@@ -43,7 +43,6 @@ jobs:
           images: ${{ secrets.DOCKERHUB_USERNAME }}/daily-chess
           tags: |
             type=sha
-            type=datetime,format=yyyy-MM-dd-HH-mm-ss
             type=semver,pattern={{version}}
             type=ref,event=branch
             type=ref,event=tag
