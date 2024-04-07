@@ -16,7 +16,7 @@ from model.ChessGameV2 import ChessGameV2
 from model.ChessOpening import ChessOpening
 from service.chess_game import get_games_for_user_v2
 from service.evaluate_game import get_worst_move_for_user
-from service.user_eval import get_elo_string, get_emoji_for_color, get_emoji_for_elo, get_opening_infos, get_record_string
+from service.user_eval import get_current_date_as_string, get_elo_string, get_emoji_for_color, get_emoji_for_elo, get_opening_infos, get_record_string
 from util.discord import send_discord_message
 from util.EnvironmentReader import EnvironmentReader
 
@@ -269,7 +269,7 @@ def main() -> None:
     ]
 
     title_embed = {
-        "title": "DAILY CHESS UPDATE :chess_pawn:",
+        "title": f"Chess Update: {get_current_date_as_string()} :chess_pawn:",
         "description": f"Recap of your last {NUM_GAMES} games.",
         "fields": elo_recap_fields,
         "color": HexColor.BLUE.value,

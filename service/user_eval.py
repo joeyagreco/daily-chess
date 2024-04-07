@@ -1,3 +1,4 @@
+from datetime import datetime
 from enumeration.ChessColor import ChessColor
 from enumeration.ChessGameOutcome import ChessGameOutcome
 from model.ChessGameV2 import ChessGameV2
@@ -70,6 +71,6 @@ def get_emoji_for_color(color: ChessColor) -> str:
         return ":white_large_square:"
     return ":black_large_square:"
 
+def get_current_date_as_string() -> str:
+    return datetime.now().strftime("%A, %B %-d")
 
-# def get_sorted_opening_infos(opening_infos: list[OpeningInfo], *, worst_elo_first: bool = True) -> list[OpeningInfo]:
-#     return sorted(opening_infos, key=lambda opening: opening.net_elo)
