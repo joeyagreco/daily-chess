@@ -1,5 +1,4 @@
 from datetime import datetime
-from typing import Optional
 
 from enumeration.ChessColor import ChessColor
 from enumeration.ChessGameOutcome import ChessGameOutcome
@@ -67,7 +66,6 @@ def get_elo_string(elo: float) -> str:
     return f"{modifier}{rounded_elo}"
 
 
-
 def get_emoji_for_elo(elo: int) -> str:
     emoji = ":chart_with_upwards_trend:" if elo > 0 else ":chart_with_downwards_trend:"
     return ":heavy_minus_sign:" if elo == 0 else emoji
@@ -92,7 +90,7 @@ def get_games_with_opening(*, games: list[ChessGameV2], opening_name: str) -> li
 
 
 def get_record_in_games(*, games: list[ChessGameV2], username: str) -> tuple[int, int, int]:
-    """ Returns record as W-L-T """
+    """Returns record as W-L-T"""
     wins = 0
     losses = 0
     ties = 0
@@ -106,7 +104,10 @@ def get_record_in_games(*, games: list[ChessGameV2], username: str) -> tuple[int
             ties += 1
     return wins, losses, ties
 
-def get_games_with_negative_rating_change(*, games: list[ChessGameV2], username: str, include_zero: bool = True) -> list[ChessGameV2]:
+
+def get_games_with_negative_rating_change(
+    *, games: list[ChessGameV2], username: str, include_zero: bool = True
+) -> list[ChessGameV2]:
     ret_games = []
     for game in games:
         chess_player = game.get_chess_player(username)
@@ -114,9 +115,9 @@ def get_games_with_negative_rating_change(*, games: list[ChessGameV2], username:
             ret_games.append(game)
     return ret_games
 
+
 def get_average_rating_change_in_games(*, games: list[ChessGameV2], username: str) -> int:
     total_rating_change = 0
     for g in games:
         total_rating_change += g.get_chess_player(username).rating_diff
     return total_rating_change / len(games)
-            

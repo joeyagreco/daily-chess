@@ -310,23 +310,26 @@ def main() -> None:
             time.sleep(1)
 
     # send worst opening embed with info for analysis
-    worst_opening_games = get_games_with_opening(games=games, opening_name=opening_infos[0].chess_opening.name)
+    worst_opening_games = get_games_with_opening(
+        games=games, opening_name=opening_infos[0].chess_opening.name
+    )
     record_w, record_l, record_t = get_record_in_games(games=worst_opening_games, username=USERNAME)
-    games_with_bad_rating_change = get_games_with_negative_rating_change(games=worst_opening_games, username=USERNAME, include_zero=True)
+    games_with_bad_rating_change = get_games_with_negative_rating_change(
+        games=worst_opening_games, username=USERNAME, include_zero=True
+    )
     # sort lowest -> highest rating change
     games_with_bad_rating_change.sort(key=lambda game: game.get_chess_player(USERNAME).rating_diff)
     # TODO: dont hardcode this value
     games_to_include = games_with_bad_rating_change[:5]
-    
-    worst_opening_content = f"""
-    **[{opening_infos[0].chess_opening.name}]({ChessOpening.get_lichess_url(opening_infos[0].chess_opening.name)})**\n
-    """
+
+    worst_opening_content = f"**[{opening_infos[0].chess_opening.name}]({ChessOpening.get_lichess_url(opening_infos[0].chess_opening.name)})**\n"
+
     # add game links
     for g in games_to_include:
         worst_opening_content += f"[{g.outcome_for_user(USERNAME).value} ({g.status.value}) as {g.color_for_user(USERNAME).value}]({g.game_url})\n"
-    
+
     worst_opening_content += f"\n**{get_elo_string(get_average_rating_change_in_games(games=worst_opening_games, username=USERNAME))}** elo per game"
-    
+
     worst_opening_embed = {
         "title": "Analyze Your Worst Opening",
         "description": worst_opening_content,
